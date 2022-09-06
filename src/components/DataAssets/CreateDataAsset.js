@@ -14,7 +14,7 @@ import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ReplayIcon from '@material-ui/icons/Replay';
 import {
-    assetFieldValue, dataAssetFieldValue, dqRulesFieldValue, ingestionFieldValue, resetDataAssetValues, updateAllDataAssetValues, updateDataFlag, updateMode
+    columnAttributeError, assetFieldValue, dataAssetFieldValue, dqRulesFieldValue, ingestionFieldValue, resetDataAssetValues, updateAllDataAssetValues, updateDataFlag, updateMode
 } from 'actions/dataAssetActions';
 import { openSideBar, openSnackbar } from 'actions/notificationAction';
 import PageTitle from 'components/Common/PageTitle';
@@ -105,7 +105,7 @@ const CreateDataAsset = (props) => {
     const [cronValue, setCronValue] = useState('');
     const [errorValue, setErrorValue] = useState('');
     const [error, setError] = useState({})
-    var [saveForm, setSaveForm] = useState(0);
+    var [saveForm, setSaveForm] = useState(false);
 
     useEffect(() => {
         if (props.mode !== 'create') {
@@ -258,6 +258,43 @@ const CreateDataAsset = (props) => {
         navigate("/data-assets");
     }
 
+    const isColumnAttributeValid = () => {
+        var fieldsToValidate = ["col_nm", "col_desc", "data_classification", "data_type",
+        "tgt_col_nm","tgt_data_type","datetime_format","tgt_datetime_format","col_length","req_tokenization","pk_ind","null_ind"];
+        var newErrorObj = props.columnAttributeError;
+        console.log("line 265, props.columnAttributesData", props.columnAttributesData)
+        props.columnAttributesData?.forEach(row => {   
+            fieldsToValidate.forEach(field => {
+                if((field == "datetime_format" && row['data_type'] != "Datetime")
+                || (field == "tgt_datetime_format" && row['tgt_data_type'] != "Datetime")){
+                    return;
+                }
+                
+                var errorMessage = "";
+                errorMessage = row[`${field}`]?.toString().trim().length > 0 
+                ? ((props.columnAttributeError[`${row.col_id}`] && props.columnAttributeError[`${row.col_id}`][`${field}`]) || "")
+                : "Required Field";
+                
+                newErrorObj = {...newErrorObj, [row.col_id]: {...newErrorObj[`${row.col_id}`], [field]: errorMessage}}                         
+            })         
+        })
+        props.setColumnAttributeError({ ...newErrorObj })
+
+        var isError = false;
+        for(var id in newErrorObj){
+            for(var col in newErrorObj[`${id}`]){
+                if(newErrorObj[`${id}`][`${col}`]){
+                    isError = true;
+                    break;
+                }
+            }
+            if(isError){
+                break;
+            }
+        }
+        return !isError;
+    }
+
     const validate = () => {
         let errorObj = {}
         errorObj = {
@@ -276,7 +313,6 @@ const CreateDataAsset = (props) => {
             triggerMechanismError: props.ingestionFieldValues.trigger_mechanism.trim() ? false : true,
             crontabError: props.ingestionFieldValues.trigger_mechanism === 'time_driven' ? (props.ingestionFieldValues.frequency.trim() ? error.crontabError : true) : false,
             extColumnError: false,
-            columnAttributeError: !props.isColumnAttributeValid
         }
         setError(errorObj);
         console.log("error obj", errorObj)
@@ -284,11 +320,10 @@ const CreateDataAsset = (props) => {
     }
 
     const handleSave = async () => {
-        console.log("field values", { ...props.fieldValues })
+        setSaveForm(true)
+        //console.log("field values", { ...props.fieldValues })
         let errorLength = validate();
-        setSaveForm(saveForm + 1)
-        console.log("isColumnAttributeValid from redux", props.isColumnAttributeValid)
-        if (errorLength) {
+        if (errorLength || !isColumnAttributeValid()) {
             props.openSnackbar({ variant: 'error', message: 'Enter all mandatory fields with valid data!' });
         } else {
             setDisableButton(true);
@@ -775,7 +810,7 @@ const mapStateToProps = state => ({
     mode: state.dataAssetState.updateMode.mode,
     dataFlag: state.dataAssetState.updateDataFlag.dataFlag,
     selectedRow: state.dataAssetState.updateSelectedRow,
-    isColumnAttributeValid: state.dataAssetState.validateColumnAttribute?.data
+    columnAttributeError: state.dataAssetState.columnAttributeError.data
 })
 const mapDispatchToProps = dispatch => bindActionCreators({
     openSnackbar,
@@ -787,7 +822,8 @@ const mapDispatchToProps = dispatch => bindActionCreators({
     assetFieldValue,
     ingestionFieldValue,
     dqRulesFieldValue,
-    openSideBar
+    openSideBar,
+    setColumnAttributeError: columnAttributeError
 }, dispatch)
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateDataAsset);

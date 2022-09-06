@@ -85,10 +85,9 @@ const updateDataAssetTableData = (state = { data: [] }, action) => {
     }
 }
 
-
-const validateColumnAttribute = (state = {}, action) => {
+const columnAttributeError = (state = {data: {}}, action) => {
     switch (action.type) {
-        case Constants.VALIDATE_COLUMN_ATTRIBUTES_DATA:
+        case Constants.COLUMN_ATTRIBUTES_DATA_ERROR:
             return { ...state, data: action.payload }
         default:
             return { ...state }
@@ -132,7 +131,7 @@ const dataAssetsReducer = combineReducers({
     updateDataFlag,
     updateDataAssetTableData,
     updateSelectedRow,
-    validateColumnAttribute
+    columnAttributeError
 })
 
 export default dataAssetsReducer;

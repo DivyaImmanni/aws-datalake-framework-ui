@@ -54,9 +54,9 @@ export const columnFieldValue = (value) => dispatch => {
     })
 }
 
-export const validateColumnAttribute = (value) => dispatch => {
+export const columnAttributeError = (value) => dispatch => {
     dispatch({
-        type: constants.VALIDATE_COLUMN_ATTRIBUTES_DATA,
+        type: constants.COLUMN_ATTRIBUTES_DATA_ERROR,
         payload: value
     })
 }
