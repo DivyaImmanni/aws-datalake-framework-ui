@@ -323,7 +323,8 @@ const CreateDataAsset = (props) => {
         setSaveForm(true)
         //console.log("field values", { ...props.fieldValues })
         let errorLength = validate();
-        if (errorLength || !isColumnAttributeValid()) {
+        let errorInColumnAttribute = !isColumnAttributeValid()
+        if (errorLength || errorInColumnAttribute) {
             props.openSnackbar({ variant: 'error', message: 'Enter all mandatory fields with valid data!' });
         } else {
             setDisableButton(true);

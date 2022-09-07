@@ -266,6 +266,10 @@ const ColumnAttributes = (props) => {
         const newTargetDateTime = { ...targetDateTimeFormatField }
         delete newTargetDateTime["" + row.col_id];
         setTargetDateTimeFormatField(newTargetDateTime)
+        
+        const newFormError = { ...props.error }
+        delete newFormError[row.col_id];
+        props.columnAttributeError(newFormError)
     }
 
     return (
