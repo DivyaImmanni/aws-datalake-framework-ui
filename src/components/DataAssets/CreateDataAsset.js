@@ -708,9 +708,9 @@ const CreateDataAsset = (props) => {
                                         onChange={(event) => handleValueChange(props.ingestionFieldValue, 'src_sql_query', 'sourceSqlQueryError', event.target.value)}
                                     />
                                 </FormControl>} */}
-                            {props.mode !== 'create' && srcIngestionValue !== 'database' &&
+                            {props.mode !== 'create' && props.mode !== 'clone' && srcIngestionValue !== 'database' &&
                                 <FormControl className={classes.formControl}>
-                                    <div > Ingestion Source Path* </div>
+                                    <div> Ingestion Source Path* </div>
                                     <TextField
                                         error={error.ingestionSourcePathError}
                                         disabled={disableButton || props.mode === 'edit'}
