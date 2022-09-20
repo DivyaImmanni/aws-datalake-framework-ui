@@ -1,3 +1,5 @@
+//Authentication Constants
+export const SET_AUTHENTICATION = 'SET_AUTHENTICATION';
 //Source system constants
 export const OPEN_SIDEBAR = 'OPEN_SIDEBAR';
 export const CLOSE_SIDEBAR = 'CLOSE_SIDEBAR';
