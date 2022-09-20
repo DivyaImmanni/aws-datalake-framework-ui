@@ -14,6 +14,7 @@ const initialDataAttributes = {
     "file_encryption_ind": false, //default false
     "asset_owner": "",
     "support_cntct": "",
+    "derived_schema": false,
     "rs_load_ind": "", //default false
 }
 const initialIngestionAttributes = {

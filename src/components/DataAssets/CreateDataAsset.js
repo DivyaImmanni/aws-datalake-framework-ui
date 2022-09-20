@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     formControl: {
-       // margin: theme.spacing(1),
+        // margin: theme.spacing(1),
         minWidth: 250,
         margin: '0px 3% 2% 0px',
         fontSize: 13,
@@ -106,7 +106,7 @@ const CreateDataAsset = (props) => {
     const [errorValue, setErrorValue] = useState('');
     const [error, setError] = useState({})
     var [saveForm, setSaveForm] = useState(false);
-
+    
     useEffect(() => {
         if (props.mode !== 'create') {
             fetchDataAssetDetails();
@@ -258,37 +258,38 @@ const CreateDataAsset = (props) => {
         navigate("/data-assets");
     }
 
+
     const isColumnAttributeValid = () => {
         var fieldsToValidate = ["col_nm", "col_desc", "data_classification", "data_type",
-        "tgt_col_nm","tgt_data_type","datetime_format","tgt_datetime_format","col_length","req_tokenization","pk_ind","null_ind"];
+            "tgt_col_nm", "tgt_data_type", "datetime_format", "tgt_datetime_format", "col_length", "req_tokenization", "pk_ind", "null_ind"];
         var newErrorObj = props.columnAttributeError;
         console.log("line 265, props.columnAttributesData", props.columnAttributesData)
-        props.columnAttributesData?.forEach(row => {   
+        props.columnAttributesData?.forEach(row => {
             fieldsToValidate.forEach(field => {
-                if((field == "datetime_format" && row['data_type'] != "Datetime")
-                || (field == "tgt_datetime_format" && row['tgt_data_type'] != "Datetime")){
+                if ((field == "datetime_format" && row['data_type'] != "Datetime")
+                    || (field == "tgt_datetime_format" && row['tgt_data_type'] != "Datetime")) {
                     return;
                 }
-                
+
                 var errorMessage = "";
-                errorMessage = row[`${field}`]?.toString().trim().length > 0 
-                ? ((props.columnAttributeError[`${row.col_id}`] && props.columnAttributeError[`${row.col_id}`][`${field}`]) || "")
-                : "Required Field";
-                
-                newErrorObj = {...newErrorObj, [row.col_id]: {...newErrorObj[`${row.col_id}`], [field]: errorMessage}}                         
-            })         
+                errorMessage = row[`${field}`]?.toString().trim().length > 0
+                    ? ((props.columnAttributeError[`${row.col_id}`] && props.columnAttributeError[`${row.col_id}`][`${field}`]) || "")
+                    : "Required Field";
+
+                newErrorObj = { ...newErrorObj, [row.col_id]: { ...newErrorObj[`${row.col_id}`], [field]: errorMessage } }
+            })
         })
         props.setColumnAttributeError({ ...newErrorObj })
 
         var isError = false;
-        for(var id in newErrorObj){
-            for(var col in newErrorObj[`${id}`]){
-                if(newErrorObj[`${id}`][`${col}`]){
+        for (var id in newErrorObj) {
+            for (var col in newErrorObj[`${id}`]) {
+                if (newErrorObj[`${id}`][`${col}`]) {
                     isError = true;
                     break;
                 }
             }
-            if(isError){
+            if (isError) {
                 break;
             }
         }
@@ -323,12 +324,15 @@ const CreateDataAsset = (props) => {
         setSaveForm(true)
         //console.log("field values", { ...props.fieldValues })
         let errorLength = validate();
-        let errorInColumnAttribute = !isColumnAttributeValid()
+        let errorInColumnAttribute = !props.assetFieldValues.derived_schema && !isColumnAttributeValid()
         if (errorLength || errorInColumnAttribute) {
             props.openSnackbar({ variant: 'error', message: 'Enter all mandatory fields with valid data!' });
         } else {
             setDisableButton(true);
             let payload = props.mode === 'edit' ? { ...props.fieldValues, asset_id: props.assetFieldValues.asset_id, src_sys_id: props.assetFieldValues.src_sys_id } : { ...props.fieldValues }
+            if(props.assetFieldValues.derived_schema){
+                payload.asset_attributes = [];
+            }
             // let payload = { ...props.fieldValues }
             let url = props.mode === 'edit' ? '/data_asset/update' : 'data_asset/create'
             try {
@@ -499,7 +503,7 @@ const CreateDataAsset = (props) => {
                                     </FormControl> */}
 
                                 </>}
-                                {displayField && props.assetFieldValues.file_type === 'csv' &&
+                            {displayField && props.assetFieldValues.file_type === 'csv' &&
                                 <>
 
                                     <FormControl className={classes.formControl}>
@@ -617,7 +621,7 @@ const CreateDataAsset = (props) => {
                         <Typography className={classes.heading}>Column Attributes</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                        <ColumnAttributes saveForm={saveForm}/>
+                        <ColumnAttributes saveForm={saveForm} />
                     </AccordionDetails>
                 </Accordion>
                 <Accordion style={{ margin: "1% 0" }}
@@ -667,7 +671,7 @@ const CreateDataAsset = (props) => {
                                         <MenuItem key="incremental" value="incremental">Incremental</MenuItem>
                                     </Select>
                                 </FormControl>}
-                                {srcIngestionValue === 'database' && props.ingestionFieldValues.ext_method === 'incremental' &&
+                            {srcIngestionValue === 'database' && props.ingestionFieldValues.ext_method === 'incremental' &&
                                 <FormControl className={classes.formControl}>
                                     <div style={{ marginBottom: '3%' }}>Extraction Column*</div>
                                     <Select
@@ -682,8 +686,8 @@ const CreateDataAsset = (props) => {
                                         <MenuItem value="">
                                             <em>Select extraction Column</em>
                                         </MenuItem>
-                                        {props.columnAttributesData.map(row=>{
-                                            if(row.data_type === 'Datetime'){
+                                        {props.columnAttributesData.map(row => {
+                                            if (row.data_type === 'Datetime') {
                                                 return <MenuItem key={row.col_nm} value={row.col_nm}>{row.col_nm}</MenuItem>
                                             }
                                         })
@@ -755,6 +759,7 @@ const CreateDataAsset = (props) => {
                                         />
                                     </FormControl>
                                 </Tooltip>}
+
                         </div>
                     </AccordionDetails>
                 </Accordion>
