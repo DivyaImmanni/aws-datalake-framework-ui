@@ -1,7 +1,10 @@
-import { CssBaseline } from "@material-ui/core";
+import { CssBaseline, Tooltip } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
+import { bindActionCreators } from 'redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Toolbar from "@material-ui/core/Toolbar";
+import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew';
+import { setAuthentication } from 'actions/authenticationAction';
 import SideBarComponent from "components/Notifications/SideBarComponent";
 import SnackbarComponent from 'components/Notifications/SnackBarComponent';
 import logo from 'images/logo white.png';
@@ -19,7 +22,8 @@ const useStyles = makeStyles((theme) => ({
         textDecoration: "none",
         color: "white",
         alignItems: 'flex-start',
-        padding:'20px'
+        padding:'20px',
+        flexGrow:1
     },
     link: {
         textDecoration: "none",
@@ -85,11 +89,14 @@ const Layout = (props) => {
                         <img src={logo}  style={{maxWidth: '120px'}}/> <span className={classes.pipe}></span>  
                         <span style={{ margin: '0 7px'}}>AWS </span> DATA LAKE
                     </Link>
-                    <div className="font-link">
+                    <div >
                         {listOfNavItems.map((item,index) => {
                             return <Link key={index} to={item.url} className={classes.link} style={index === activePageIndex ? {'paddingBottom': 8, 'borderBottom':'4px solid #F7901D', color: 'white'}:{}} onClick={()=>handleOnclick(index)}>{item.name} </Link>
                         })}
                     </div>
+                    <span style={{padding:'25px 0px 20px 10px', color: '#F7901D', cursor:'pointer'}}> <Tooltip title="log out" placement='top'>
+                        <PowerSettingsNewIcon onClick={() => props.setAuthentication({})} />
+                    </Tooltip></span>
                 </Toolbar>
             </AppBar>: ''}
             <main className={classes.content} style={{marginBottom:20, display: "flex"}}>
@@ -114,4 +121,7 @@ const Layout = (props) => {
 const mapStateToProps = state => ({
     openSideBar: state.notificationState.openSideBar.open
 })
-export default connect(mapStateToProps)(Layout);
+const mapDispatchToProps = dispatch => bindActionCreators({
+    setAuthentication,
+}, dispatch)
+export default connect(mapStateToProps, mapDispatchToProps)(Layout);

@@ -1,8 +1,11 @@
 /* eslint-disable no-useless-computed-key */
 /* eslint-disable jsx-a11y/alt-text */
 
+import { Tooltip } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Toolbar from "@material-ui/core/Toolbar";
+import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew';
+import { setAuthentication } from 'actions/authenticationAction';
 import awsLogo from 'images/AWS logo.png';
 import backgroundImage from 'images/background.png';
 import dataAssetIcon from 'images/dataAssetIcon.png';
@@ -10,7 +13,9 @@ import lakeDestinationIcon from 'images/lakeDestinationIcon.png';
 import logo from 'images/logo white.png';
 import sourceSystemIcon from 'images/sourceSystemIcon.png';
 import React, { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
+import { bindActionCreators } from 'redux';
 
 const useStyles = makeStyles((theme) => ({
     logo: {
@@ -21,7 +26,8 @@ const useStyles = makeStyles((theme) => ({
         textDecoration: "none",
         color: "white",
         alignItems: 'flex-start',
-        padding: '20px'
+        padding: '20px',
+        flexGrow:1
     },
     link: {
         textDecoration: "none",
@@ -212,7 +218,7 @@ const Dashboard = (props) => {
     return (
         <div className={classes.container}>
             <div style={{ padding: '15px 5px' }}>
-                <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Toolbar style={{ display: 'flex'}}>
                     <Link to="/" className={classes.logo}>
                         <img src={logo}  style={{maxWidth: '120px'}}/> <span className={classes.pipe}></span>  
                         <span style={{ margin: '0 7px'}}>AWS </span> DATA LAKE
@@ -222,6 +228,9 @@ const Dashboard = (props) => {
                             return <Link key={index} to={item.url} className={classes.link} style={index === activePageIndex ? { 'paddingBottom': 8, 'borderBottom': '4px solid #F7901D', color: 'white' } : {}} onClick={() => handleOnclick(index)}>{item.name} </Link>
                         })}
                     </div>
+                    <span style={{padding:'20px 0px 20px 10px', color: '#F7901D', cursor:'pointer'}}> <Tooltip title="log out" placement='top'>
+                        <PowerSettingsNewIcon onClick={() => props.setAuthentication({})} />
+                    </Tooltip></span>
                 </Toolbar>
             </div>
             <h1 className={classes.pageHeader}>
@@ -266,4 +275,11 @@ const Dashboard = (props) => {
     )
 }
 
-export default Dashboard;
+const mapStateToProps = state => ({
+    openSideBar: state.notificationState.openSideBar.open
+})
+const mapDispatchToProps = dispatch => bindActionCreators({
+    setAuthentication,
+}, dispatch)
+
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
