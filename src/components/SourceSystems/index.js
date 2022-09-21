@@ -80,7 +80,8 @@ const SourceSystems = (props) => {
   useEffect(() => {
     if (props.dataFlag) {
       setLoading(true);
-      axios.post('http://localhost:8000/source_system', { "fetch_limit": 'all', "src_config": { "src_sys_id": null } })
+      // axios.post('http://localhost:8000/source_system', { "fetch_limit": 'all', "src_config": { "src_sys_id": null } })
+      defaultInstance.post('/source_system/read?tasktype=read', { "fetch_limit": 'all', "src_config": { "src_sys_id": null } })
         .then(response => {
           if (response.data.responseStatus) {
             props.updateSourceSysTableData(response.data.responseBody);
