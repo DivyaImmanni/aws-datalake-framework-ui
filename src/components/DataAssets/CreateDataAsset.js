@@ -324,13 +324,13 @@ const CreateDataAsset = (props) => {
         setSaveForm(true)
         //console.log("field values", { ...props.fieldValues })
         let errorLength = validate();
-        let errorInColumnAttribute = !props.assetFieldValues.derived_schema && !isColumnAttributeValid()
+        let errorInColumnAttribute = !props.assetFieldValues.derive_schema && !isColumnAttributeValid()
         if (errorLength || errorInColumnAttribute) {
             props.openSnackbar({ variant: 'error', message: 'Enter all mandatory fields with valid data!' });
         } else {
             setDisableButton(true);
             let payload = props.mode === 'edit' ? { ...props.fieldValues, asset_id: props.assetFieldValues.asset_id, src_sys_id: props.assetFieldValues.src_sys_id } : { ...props.fieldValues }
-            if(props.assetFieldValues.derived_schema){
+            if(props.assetFieldValues.derive_schema){
                 payload.asset_attributes = [];
             }
             // let payload = { ...props.fieldValues }
@@ -708,9 +708,9 @@ const CreateDataAsset = (props) => {
                                         onChange={(event) => handleValueChange(props.ingestionFieldValue, 'src_sql_query', 'sourceSqlQueryError', event.target.value)}
                                     />
                                 </FormControl>} */}
-                            {props.mode !== 'create' && srcIngestionValue !== 'database' &&
+                            {props.mode !== 'create' && props.mode !== 'clone' && srcIngestionValue !== 'database' &&
                                 <FormControl className={classes.formControl}>
-                                    <div > Ingestion Source Path* </div>
+                                    <div> Ingestion Source Path* </div>
                                     <TextField
                                         error={error.ingestionSourcePathError}
                                         disabled={disableButton || props.mode === 'edit'}

@@ -83,8 +83,8 @@ const ColumnAttributes = (props) => {
     const [checkDisable, setCheckDisable] = useState(false);
 
     const handleChangeBox = () => {
-        setCheckDisable(!props.assetFieldValues.derived_schema)
-        props.assetFieldValue("derived_schema", !props.assetFieldValues.derived_schema)
+        setCheckDisable(!props.assetFieldValues.derive_schema)
+        props.assetFieldValue("derive_schema", !props.assetFieldValues.derive_schema)
         console.log(checkDisable);
     }
 
@@ -117,7 +117,7 @@ const ColumnAttributes = (props) => {
         setCustomDateTimeFormatField(customDateTimeFormat)
         setCustomTargetDateTimeFormatField(customTargetDateTimeFormat)
         setExpanded(0)
-        setCheckDisable(props.assetFieldValues.derived_schema)
+        setCheckDisable(props.assetFieldValues.derive_schema)
     }, []);
 
     // useEffect(() => {
@@ -294,7 +294,7 @@ const ColumnAttributes = (props) => {
                 <div style={{position: 'absolute',top: '1%', right: '18%', paddingTop: "13px"}}>
                 <Box className={classes.formControlLabel}>
                         <Box>
-                            <FormControlLabel label=" Derived Schema"
+                            <FormControlLabel label=" Derive Schema"
                                 control={<Checkbox checked={checkDisable} onChange={handleChangeBox} />}
                             />
                         </Box>
