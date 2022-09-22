@@ -55,6 +55,7 @@ const useStyles = makeStyles((theme) => ({
         maxWidth: 250,
     },
     formControlLabel:{
+        fontSize:"14px",
       
     },
     button: {
@@ -84,6 +85,7 @@ const ColumnAttributes = (props) => {
 
     const handleChangeBox = () => {
         setCheckDisable(!props.assetFieldValues.derive_schema)
+        props.columnAttributeError({})
         props.assetFieldValue("derive_schema", !props.assetFieldValues.derive_schema)
         console.log(checkDisable);
     }
@@ -91,6 +93,24 @@ const ColumnAttributes = (props) => {
     useEffect(() => {
         if (props.mode === 'view' || props.mode === 'delete') {
             setDisableButton(true);
+        }
+        if(props.mode === 'create'){
+            props.columnAttributeError({})
+            props.columnFieldValue([{
+                "col_id": 1,
+                "col_nm": "",
+                "tgt_col_nm": "",
+                "tgt_data_type": "",
+                "tgt_datetime_format": "",
+                "col_desc": "",
+                "data_classification": "",
+                "col_length": 0,
+                "req_tokenization": false,
+                "pk_ind": false,
+                "data_type": "",
+                "datetime_format": "",
+                "null_ind": false
+            }])
         }
         var dateTimeFormat = {};
         var targetDateTimeFormat = {};
@@ -291,7 +311,7 @@ const ColumnAttributes = (props) => {
                 <div style={{ position: 'absolute', top: '1%', right: '5%' }}>
                     <Button variant="contained" className={classes.button} onClick={handleAddNew}>Add New +</Button>
                 </div>}
-                <div style={{position: 'absolute',top: '1%', right: '18%', paddingTop: "13px"}}>
+                <div style={{position: 'absolute',top: '1%', right: '15%', paddingTop: "5px"}}>
                 <Box className={classes.formControlLabel}>
                         <Box>
                             <FormControlLabel label=" Derive Schema"
