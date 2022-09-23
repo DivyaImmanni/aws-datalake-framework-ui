@@ -105,8 +105,7 @@ const CreateDataAsset = (props) => {
     const [cronValue, setCronValue] = useState('');
     const [errorValue, setErrorValue] = useState('');
     const [error, setError] = useState({})
-    var [saveForm, setSaveForm] = useState(false);
-    
+
     useEffect(() => {
         if (props.mode !== 'create') {
             fetchDataAssetDetails();
@@ -261,16 +260,22 @@ const CreateDataAsset = (props) => {
 
     const isColumnAttributeValid = () => {
         var fieldsToValidate = ["col_nm", "col_desc", "data_classification", "data_type",
-            "tgt_col_nm", "tgt_data_type", "datetime_format", "tgt_datetime_format", "col_length", "req_tokenization", "pk_ind", "null_ind"];
+            "tgt_col_nm", "datetime_format","customdatetime_format",
+            "customtargetdatetime_format", "col_length", "req_tokenization", "pk_ind", "null_ind"];
         var newErrorObj = props.columnAttributeError;
-        console.log("line 265, props.columnAttributesData", props.columnAttributesData)
         props.columnAttributesData?.forEach(row => {
             fieldsToValidate.forEach(field => {
-                if ((field == "datetime_format" && row['data_type'] != "Datetime")
-                    || (field == "tgt_datetime_format" && row['tgt_data_type'] != "Datetime")) {
+                // if data type is not Date time, no need to check datetime format field
+                if ((field == "datetime_format" && row['data_type'] != "Datetime")) {
                     return;
                 }
-
+                
+                // if data time format is not custom, no need to check custom datetime format field
+                if ((field == "customdatetime_format" && row['datetime_format'] != "custom")
+                    || (field == "customtargetdatetime_format" && row['tgt_datetime_format'] != "custom")) {
+                    return;
+                }
+                
                 var errorMessage = "";
                 errorMessage = row[`${field}`]?.toString().trim().length > 0
                     ? ((props.columnAttributeError[`${row.col_id}`] && props.columnAttributeError[`${row.col_id}`][`${field}`]) || "")
@@ -321,7 +326,6 @@ const CreateDataAsset = (props) => {
     }
 
     const handleSave = async () => {
-        setSaveForm(true)
         //console.log("field values", { ...props.fieldValues })
         let errorLength = validate();
         let errorInColumnAttribute = !props.assetFieldValues.derive_schema && !isColumnAttributeValid()
@@ -332,6 +336,18 @@ const CreateDataAsset = (props) => {
             let payload = props.mode === 'edit' ? { ...props.fieldValues, asset_id: props.assetFieldValues.asset_id, src_sys_id: props.assetFieldValues.src_sys_id } : { ...props.fieldValues }
             if(props.assetFieldValues.derive_schema){
                 payload.asset_attributes = [];
+            }else{
+                payload.asset_attributes = payload.asset_attributes?.map(row => {
+                    if(row.datetime_format == 'custom'){                        
+                        row = { ...row, datetime_format: row.customdatetime_format }
+                    }
+                    if(row.tgt_datetime_format == 'custom'){                        
+                        row = { ...row, tgt_datetime_format: row.customtargetdatetime_format }
+                    }
+                    delete row.customdatetime_format;                                                
+                    delete row.customtargetdatetime_format;                        
+                    return row;
+                })
             }
             // let payload = { ...props.fieldValues }
             let url = props.mode === 'edit' ? '/data_asset/update' : 'data_asset/create'
@@ -621,7 +637,7 @@ const CreateDataAsset = (props) => {
                         <Typography className={classes.heading}>Column Attributes</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                        <ColumnAttributes saveForm={saveForm} />
+                        <ColumnAttributes />
                     </AccordionDetails>
                 </Accordion>
                 <Accordion style={{ margin: "1% 0" }}

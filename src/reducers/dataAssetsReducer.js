@@ -39,7 +39,9 @@ const initialColumnAttributes = [{
     "pk_ind": false,
     "data_type": "",
     "datetime_format": "",
-    "null_ind": false
+    "null_ind": false,
+    "customdatetime_format": "",
+    "customtargetdatetime_format": ""
 }]
 
 const dialogue = (state = { flag: false }, action) => {

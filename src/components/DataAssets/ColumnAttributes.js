@@ -77,10 +77,6 @@ const ColumnAttributes = (props) => {
     const navigate = useNavigate();
     const [expanded, setExpanded] = React.useState(-1);
     const [disableButton, setDisableButton] = useState(false);
-    const [dateTimeFormatField, setDateTimeFormatField] = useState({});
-    const [customDateTimeFormatField, setCustomDateTimeFormatField] = useState({});
-    const [targetDateTimeFormatField, setTargetDateTimeFormatField] = useState({});
-    const [customTargetDateTimeFormatField, setCustomTargetDateTimeFormatField] = useState({});
     const [checkDisable, setCheckDisable] = useState(false);
 
     const handleChangeBox = () => {
@@ -112,61 +108,30 @@ const ColumnAttributes = (props) => {
                 "null_ind": false
             }])
         }
-        var dateTimeFormat = {};
-        var targetDateTimeFormat = {};
-        var customDateTimeFormat = {};
-        var customTargetDateTimeFormat = {};
 
         props.columnAttributesData?.forEach(row => {
-            if (DATE_TIME_FORMATS.find(d => d.value == row.datetime_format)) {
-                dateTimeFormat[row.col_id + ""] = row.datetime_format;
-            } else if (row.datetime_format) {
-                dateTimeFormat[row.col_id + ""] = "custom";
-                customDateTimeFormat[row.col_id + ""] = row.datetime_format
+            var isDateTimeFormatCustom = !DATE_TIME_FORMATS.find(d => d.value == row.datetime_format);
+            var isTargetDateTimeFormatCustom = !DATE_TIME_FORMATS.find(d => d.value == row.tgt_datetime_format);
+            let info = props.columnAttributesData;
+            let indexValue = findIndexofObject(row);
+
+            // if the datatime format is custom
+            if (isDateTimeFormatCustom && row.datetime_format) { 
+                info.splice(indexValue, 1, { ...row, datetime_format: 'custom', customdatetime_format: row.datetime_format})
             }
 
-            if (DATE_TIME_FORMATS.find(d => d.value == row.tgt_datetime_format)) {
-                targetDateTimeFormat[row.col_id + ""] = row.tgt_datetime_format;
-            } else if (row.tgt_datetime_format) {
-                targetDateTimeFormat[row.col_id + ""] = "custom";
-                customTargetDateTimeFormat[row.col_id + ""] = row.tgt_datetime_format
+            // if the target datatime format is custom, 
+            // USED info[indexValue] INSTEAD OF row, BECAUSE row is not updated from above condition
+            if (isTargetDateTimeFormatCustom && row.tgt_datetime_format) {
+                info.splice(indexValue, 1, { ...info[indexValue], tgt_datetime_format: 'custom', customtargetdatetime_format: row.tgt_datetime_format })
             }
+
+            props.columnFieldValue([...info]);                
+            
         })
-        setDateTimeFormatField(dateTimeFormat)
-        setTargetDateTimeFormatField(targetDateTimeFormat)
-        setCustomDateTimeFormatField(customDateTimeFormat)
-        setCustomTargetDateTimeFormatField(customTargetDateTimeFormat)
         setExpanded(0)
         setCheckDisable(props.assetFieldValues.derive_schema)
     }, []);
-
-    // useEffect(() => {
-    //     props.saveForm && validate();
-    // }, [props.saveForm]);
-
-    const handleDateTimeFormatChange = (row, value) => {
-        setDateTimeFormatField({ ...dateTimeFormatField, [row.col_id + ""]: value })
-        handleValueChange(row, "datetime_format", value == "custom" ? "" : value, { required: value != "custom" });
-    }
-
-    const handleCustomDateTimeFormatChange = (row, value) => {
-        setCustomDateTimeFormatField({ ...customDateTimeFormatField, [row.col_id]: value })
-        handleValueChange(row, "datetime_format", value, { required: false });
-        var errorMessage = (value || "").toString().trim().length > 0 ? "" : "Required Field";
-        props.columnAttributeError({ ...props.error, [row.col_id]: { ...props.error[`${row.col_id}`], customdatetime_format: errorMessage } })
-    }
-
-    const handleTargetDateTimeFormatChange = (row, value) => {
-        setTargetDateTimeFormatField({ ...targetDateTimeFormatField, [row.col_id]: value })
-        handleValueChange(row, "tgt_datetime_format", value == "custom" ? "" : value);
-    }
-
-    const handleCustomTargetDateTimeFormatChange = (row, value) => {
-        setCustomTargetDateTimeFormatField({ ...customTargetDateTimeFormatField, [row.col_id]: value })
-        handleValueChange(row, "tgt_datetime_format", value, { required: false });
-        var errorMessage = (value || "").toString().trim().length > 0 ? "" : "Required Field";
-        props.columnAttributeError({ ...props.error, [row.col_id]: { ...props.error[`${row.col_id}`], customtargetdatetime_format: errorMessage } })
-    }
 
     const handleChange = (row, id) => (_, isExpanded) => {
         setExpanded(isExpanded ? id : false)
@@ -216,47 +181,6 @@ const ColumnAttributes = (props) => {
         navigate("/data-assets");
     }
 
-    const validate = () => {
-        var fieldsToValidate = ["col_nm", "col_desc", "data_classification", "data_type",
-            "tgt_col_nm", "tgt_data_type", "datetime_format", "tgt_datetime_format", "col_length", "req_tokenization", "pk_ind", "null_ind"];
-        var newErrorObj = {};
-        props.columnAttributesData?.forEach(row => {
-            fieldsToValidate.forEach(field => {
-                if ((field == "datetime_format" && row['data_type'] != "Datetime")
-                    || (field == "tgt_datetime_format" && row['tgt_data_type'] != "Datetime")) {
-                    return;
-                }
-
-                var errorMessage = "";
-                errorMessage = row[`${field}`]?.toString().trim().length > 0
-                    ? ((props.error[`${row.col_id}`] && props.error[`${row.col_id}`][`${field}`]) || "")
-                    : "Required Field";
-
-                if (field == "datetime_format" && customDateTimeFormatField[`${row.col_id}`]?.toString().trim().length > 0) {
-                    errorMessage = "";
-                }
-                newErrorObj = { ...newErrorObj, [row.col_id]: { ...newErrorObj[`${row.col_id}`], [field]: errorMessage } }
-                //console.log("newErrorObj", newErrorObj)
-                //handleValueChange(row, field, row[`${field}`], {required: true})                    
-            })
-        })
-
-        var isError = false;
-        newErrorObj = { ...props.error, ...newErrorObj }
-        for (var id in newErrorObj) {
-            for (var col in newErrorObj[`${id}`]) {
-                if (newErrorObj[`${id}`][`${col}`]) {
-                    isError = true;
-                    break;
-                }
-            }
-            if (isError) {
-                break;
-            }
-        }
-        props.columnAttributeError({ ...newErrorObj })
-    }
-
     const handleAddNew = () => {
         props.columnFieldValue([...props.columnAttributesData, {
             "col_id": props.columnAttributesData.length + 1,
@@ -283,22 +207,6 @@ const ColumnAttributes = (props) => {
         info.splice(indexValue, 1);
         let data = info.map((item, index) => { return { ...item, col_id: index + 1 } })
         props.columnFieldValue([...data]);
-
-        const newCustomDateTime = { ...customDateTimeFormatField }
-        delete newCustomDateTime["" + row.col_id];
-        setCustomDateTimeFormatField(newCustomDateTime)
-
-        const newDateTime = { ...dateTimeFormatField }
-        delete newDateTime["" + row.col_id];
-        setDateTimeFormatField(newDateTime)
-
-        const newTargetCustomDateTime = { ...customTargetDateTimeFormatField }
-        delete newTargetCustomDateTime["" + row.col_id];
-        setCustomTargetDateTimeFormatField(newTargetCustomDateTime)
-
-        const newTargetDateTime = { ...targetDateTimeFormatField }
-        delete newTargetDateTime["" + row.col_id];
-        setTargetDateTimeFormatField(newTargetDateTime)
 
         const newFormError = { ...props.error }
         delete newFormError[row.col_id];
@@ -411,8 +319,8 @@ const ColumnAttributes = (props) => {
                                             variant="outlined"
                                             id="datetime_format"
                                             helperText={props.error[`${row.col_id}`]?.datetime_format}
-                                            value={dateTimeFormatField[`${row.col_id}`]}
-                                            onChange={(event) => handleDateTimeFormatChange(row, event.target.value)}
+                                            value={row.datetime_format}
+                                            onChange={(event) => handleValueChange(row, 'datetime_format', event.target.value)}
                                         >
                                             <MenuItem value="">
                                                 <em>Select datetime format</em>
@@ -422,7 +330,7 @@ const ColumnAttributes = (props) => {
                                             })}
                                         </Select>
                                     </FormControl>}
-                                {row.data_type === "Datetime" && dateTimeFormatField[`${row.col_id}`] == "custom" &&
+                                {row.data_type === "Datetime" && row.datetime_format == "custom" &&
                                     <FormControl className={classes.formControl}>
                                         <div>Custom Datetime Format*</div>
                                         <TextField
@@ -433,8 +341,8 @@ const ColumnAttributes = (props) => {
                                             variant="outlined"
                                             helperText={props.error[`${row.col_id}`]?.customdatetime_format}
                                             id="customdatetime_format"
-                                            value={customDateTimeFormatField[`${row.col_id}`]}
-                                            onChange={(event) => handleCustomDateTimeFormatChange(row, event.target.value)}
+                                            value={row.customdatetime_format}
+                                            onChange={(event) => handleValueChange(row, 'customdatetime_format', event.target.value)}
                                         />
                                     </FormControl>}
                                 <FormControl className={classes.formControl}>
@@ -526,7 +434,7 @@ const ColumnAttributes = (props) => {
                                         // helperText={props.error[`${row.col_id}`]?.tgt_data_type}
                                         id="tgt_data_type"
                                         value={row.tgt_data_type}
-                                        onChange={(event) => handleValueChange(row, 'tgt_data_type', event.target.value,{ required: false})}
+                                        onChange={(event) => handleValueChange(row, 'tgt_data_type', event.target.value, { required: false})}
                                     >
                                         <MenuItem value="">
                                             <em>Select target data type</em>
@@ -546,8 +454,8 @@ const ColumnAttributes = (props) => {
                                             variant="outlined"
                                             // helperText={props.error[`${row.col_id}`]?.tgt_datetime_format}
                                             id="tgt_datetime_format"
-                                            value={targetDateTimeFormatField[`${row.col_id}`]}
-                                            onChange={(event) => handleTargetDateTimeFormatChange(row, event.target.value)}
+                                            value={row.tgt_datetime_format}
+                                            onChange={(event) => handleValueChange(row, 'tgt_datetime_format', event.target.value, { required: false })}
                                         >
                                             <MenuItem value="">
                                                 <em>Select target datetime format</em>
@@ -559,7 +467,7 @@ const ColumnAttributes = (props) => {
                                     </FormControl>}
 
                                 {row.tgt_data_type === "Datetime" &&
-                                    targetDateTimeFormatField[`${row.col_id}`] === "custom" &&
+                                    row.tgt_datetime_format === "custom" &&
                                     <FormControl className={classes.formControl}>
                                         <div>Custom Target Datetime Format*</div>
                                         <TextField
@@ -570,8 +478,8 @@ const ColumnAttributes = (props) => {
                                             variant="outlined"
                                             helperText={props.error[`${row.col_id}`]?.customtargetdatetime_format}
                                             id="customtargetdatetime_format"
-                                            value={customTargetDateTimeFormatField[`${row.col_id}`]}
-                                            onChange={(event) => handleCustomTargetDateTimeFormatChange(row, event.target.value)}
+                                            value={row.customtargetdatetime_format}
+                                            onChange={(event) => handleValueChange(row, 'customtargetdatetime_format', event.target.value)}
                                         />
                                     </FormControl>}
                             </div>
