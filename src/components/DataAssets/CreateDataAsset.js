@@ -338,7 +338,9 @@ const CreateDataAsset = (props) => {
             let payload = props.mode === 'edit' ? { ...props.fieldValues, asset_id: props.assetFieldValues.asset_id, src_sys_id: props.assetFieldValues.src_sys_id } : { ...props.fieldValues }
             if(props.assetFieldValues.derive_schema){
                 payload.asset_attributes = [];
-            }else{
+                props.assetFieldValues.derive_schema = true;
+            } else{
+                props.assetFieldValues.derive_schema = false;
                 payload.asset_attributes = payload.asset_attributes?.map(row => {
                     if(row.datetime_format == 'custom'){                        
                         row = { ...row, datetime_format: row.customdatetime_format }
