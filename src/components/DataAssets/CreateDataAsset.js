@@ -262,8 +262,8 @@ const CreateDataAsset = (props) => {
 
     const isColumnAttributeValid = () => {
         var fieldsToValidate = ["col_nm", "col_desc", "data_classification", "data_type",
-            "tgt_col_nm", "datetime_format","customdatetime_format",
-            "customtargetdatetime_format", "col_length", "req_tokenization", "pk_ind", "null_ind"];
+             "datetime_format","customdatetime_format",
+            "customtargetdatetime_format", "req_tokenization", "pk_ind"];
         var newErrorObj = props.columnAttributeError;
         props.columnAttributesData?.forEach(row => {
             fieldsToValidate.forEach(field => {
