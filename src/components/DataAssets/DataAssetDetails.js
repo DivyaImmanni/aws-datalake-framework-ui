@@ -328,12 +328,13 @@ const DataAssetDetails = (props) => {
                     </div>
                     <div>{props.ingestionFieldValues.trigger_mechanism}</div>
                   </FormControl>
+                  {props.ingestionFieldValues.trigger_mechanism === 'time_driven' &&
                   <FormControl className={classes.formControl}>
                     <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
                       Frequency
                     </div>
                     <div>{props.ingestionFieldValues.frequency}</div>
-                  </FormControl>
+                  </FormControl>}
                 </div>
               </div>
             </TabPanel>
