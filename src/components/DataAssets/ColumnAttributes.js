@@ -222,8 +222,8 @@ const ColumnAttributes = (props) => {
                 <div style={{position: 'absolute',top: '1%', right: '15%', paddingTop: "5px"}}>
                 <Box className={classes.formControlLabel}>
                         <Box>
-                            <FormControlLabel label=" Derive Schema"
-                                control={<Checkbox checked={checkDisable} onChange={handleChangeBox} />}
+                            <FormControlLabel label=" Derive Schema" disabled={disableButton}
+                                control={<Checkbox checked={props.assetFieldValues.derive_schema} onChange={handleChangeBox} />}
                             />
                         </Box>
                     </Box>
@@ -311,14 +311,14 @@ const ColumnAttributes = (props) => {
                                 </FormControl>
                                 {row.data_type === "Datetime" &&
                                     <FormControl className={classes.formControl}>
-                                        <div style={{ marginBottom: '3%' }}>Datetime Format*</div>
+                                        <div style={{ marginBottom: '3%' }}>Datetime Format</div>
                                         <Select
-                                            error={Boolean(props.error[`${row.col_id}`]?.datetime_format)}
+                                            // error={Boolean(props.error[`${row.col_id}`]?.datetime_format)}
                                             disabled={disableButton || checkDisable }
                                             margin="dense"
                                             variant="outlined"
                                             id="datetime_format"
-                                            helperText={props.error[`${row.col_id}`]?.datetime_format}
+                                            // helperText={props.error[`${row.col_id}`]?.datetime_format}
                                             value={row.datetime_format}
                                             onChange={(event) => handleValueChange(row, 'datetime_format', event.target.value)}
                                         >

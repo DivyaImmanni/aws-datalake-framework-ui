@@ -262,15 +262,15 @@ const CreateDataAsset = (props) => {
 
     const isColumnAttributeValid = () => {
         var fieldsToValidate = ["col_nm", "col_desc", "data_classification", "data_type",
-             "datetime_format","customdatetime_format",
+             "customdatetime_format",
             "customtargetdatetime_format", "req_tokenization", "pk_ind"];
         var newErrorObj = props.columnAttributeError;
         props.columnAttributesData?.forEach(row => {
             fieldsToValidate.forEach(field => {
                 // if data type is not Date time, no need to check datetime format field
-                if ((field == "datetime_format" && row['data_type'] != "Datetime")) {
-                    return;
-                }
+                // if ((field == "datetime_format" && row['data_type'] != "Datetime")) {
+                //     return;
+                // }
                 
                 // if data time format is not custom, no need to check custom datetime format field
                 if ((field == "customdatetime_format" && row['datetime_format'] != "custom")
