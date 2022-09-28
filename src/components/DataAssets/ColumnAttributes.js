@@ -80,9 +80,10 @@ const ColumnAttributes = (props) => {
     const [checkDisable, setCheckDisable] = useState(false);
 
     const handleChangeBox = () => {
-        setCheckDisable(!props.assetFieldValues.derive_schema)
+        var deriveSchema = props.assetFieldValues.derive_schema?.toString() == "true";
+        setCheckDisable(!deriveSchema)
         props.columnAttributeError({})
-        props.assetFieldValue("derive_schema", !props.assetFieldValues.derive_schema)
+        props.assetFieldValue("derive_schema", !deriveSchema)
         console.log(checkDisable);
     }
 
@@ -130,7 +131,7 @@ const ColumnAttributes = (props) => {
             
         })
         setExpanded(0)
-        setCheckDisable(props.assetFieldValues.derive_schema)
+        setCheckDisable(props.assetFieldValues.derive_schema?.toString() == "true")
     }, []);
 
     const handleChange = (row, id) => (_, isExpanded) => {
@@ -222,8 +223,8 @@ const ColumnAttributes = (props) => {
                 <div style={{position: 'absolute',top: '1%', right: '15%', paddingTop: "5px"}}>
                 <Box className={classes.formControlLabel}>
                         <Box>
-                            <FormControlLabel label=" Derive Schema"
-                                control={<Checkbox checked={checkDisable} onChange={handleChangeBox} />}
+                            <FormControlLabel label=" Derive Schema" disabled={disableButton}
+                                control={<Checkbox checked={props.assetFieldValues.derive_schema?.toString() == "true"} onChange={handleChangeBox} />}
                             />
                         </Box>
                     </Box>
@@ -311,14 +312,14 @@ const ColumnAttributes = (props) => {
                                 </FormControl>
                                 {row.data_type === "Datetime" &&
                                     <FormControl className={classes.formControl}>
-                                        <div style={{ marginBottom: '3%' }}>Datetime Format*</div>
+                                        <div style={{ marginBottom: '3%' }}>Datetime Format</div>
                                         <Select
-                                            error={Boolean(props.error[`${row.col_id}`]?.datetime_format)}
+                                            // error={Boolean(props.error[`${row.col_id}`]?.datetime_format)}
                                             disabled={disableButton || checkDisable }
                                             margin="dense"
                                             variant="outlined"
                                             id="datetime_format"
-                                            helperText={props.error[`${row.col_id}`]?.datetime_format}
+                                            // helperText={props.error[`${row.col_id}`]?.datetime_format}
                                             value={row.datetime_format}
                                             onChange={(event) => handleValueChange(row, 'datetime_format', event.target.value)}
                                         >
