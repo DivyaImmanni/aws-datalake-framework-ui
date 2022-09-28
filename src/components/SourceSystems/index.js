@@ -16,6 +16,7 @@ import { connect } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import defaultInstance from 'routes/defaultInstance';
+import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
   customWidth: {
@@ -79,6 +80,7 @@ const SourceSystems = (props) => {
   useEffect(() => {
     if (props.dataFlag) {
       setLoading(true);
+      // axios.post('http://localhost:8000/source_system', { "fetch_limit": 'all', "src_config": { "src_sys_id": null } })
       defaultInstance.post('/source_system/read?tasktype=read', { "fetch_limit": 'all', "src_config": { "src_sys_id": null } })
         .then(response => {
           if (response.data.responseStatus) {

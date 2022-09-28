@@ -1,11 +1,12 @@
-import { Breadcrumbs, Link } from '@material-ui/core';
+import { Box, Breadcrumbs, Fab, Link, Tooltip } from '@material-ui/core';
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { makeStyles } from '@material-ui/core/styles';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import RefreshIcon from '@material-ui/icons/Refresh';
 import { openSideBar } from 'actions/notificationAction';
 import ViewCatalog from 'components/DataAssets/ViewCatalog';
 import tableIcons from "components/MetaData/MaterialTableIcons";
-import MaterialTable from "material-table";
+import MaterialTable, { MTableToolbar } from "material-table";
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
@@ -31,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
       borderBottom: 'none'
     },
   },
-  idHeader:{
+  idHeader: {
     color: '#00B1E8',
     cursor: 'pointer',
     paddingLeft: '5%',
@@ -47,6 +48,19 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "12px",
     marginLeft: 0,
   },
+  button: {
+    float: 'right',
+    margin: '15px',
+    backgroundColor: 'black',
+    color: '#F7901D',
+    '&:hover': {
+        fontWeight: '600',
+        backgroundColor: 'black',
+    },
+    '&:disabled': {
+        background: '#A3A3A390',
+    },
+},
 }));
 
 const urlSearchParams = new URLSearchParams(window.location.search);
@@ -56,8 +70,8 @@ const DataCatalogDetails = (props) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState({});
-  const [data,setData] = useState([]);
-  const [backdrop,setBackdrop] = useState(false);
+  const [data, setData] = useState([]);
+  const [backdrop, setBackdrop] = useState(false);
 
   const columns = [
     {
@@ -73,6 +87,10 @@ const DataCatalogDetails = (props) => {
   ];
 
   useEffect(() => {
+    getDataCatalogDetails();
+  }, [])
+
+  const getDataCatalogDetails = () => {
     setBackdrop(true);
     defaultInstance.post('/data_catalog/read', { "src_sys_id": params.src_sys_id, "asset_id": params.asset_id })
       .then(response => {
@@ -84,39 +102,51 @@ const DataCatalogDetails = (props) => {
         setData([]);
         setBackdrop(false);
       })
-  }, [])
-
+  }
   const handleAction = (rowData) => {
     setOpen(true);
-    setSelectedRow({...rowData})
+    setSelectedRow({ ...rowData })
   }
 
   return (
     <>
       <CssBaseline />
-     {open && <ViewCatalog open={open} setOpen={setOpen} fieldValues={selectedRow}/>} 
+      {open && <ViewCatalog open={open} setOpen={setOpen} fieldValues={selectedRow} />}
       <div className={classes.table}>
         {/* <PageTitle showInfo={() => props.openSideBar({ heading: 'Data Catalog Details', content: 'Data Catalog Details Content' })}>
           Data Catalog Details
         </PageTitle> */}
-         <div>
-            <h2 >
-                <span style={{fontSize: '25px',lineHeight: '30px',margin: 0,color:'#646262eb' }}>Data Catalog Details</span>
-            </h2>
+        <div>
+          <h2 >
+            <span style={{ fontSize: '25px', lineHeight: '30px', margin: 0, color: '#646262eb' }}>Data Catalog Details</span>
+          </h2>
         </div>
         <div style={{ display: 'flex', marginBottom: "15px" }}>
           <ArrowBackIosIcon fontSize='small' />
           <Breadcrumbs aria-label='Breadcrumb'>
-            <Link component={RouterLink} to='/data-assets' style={{ color: '#00B1E8', fontSize:'16px' }}>
+            <Link component={RouterLink} to='/data-assets' style={{ color: '#00B1E8', fontSize: '16px' }}>
               Data Assets
             </Link>
-            <Link style={{ textDecoration: 'none', color: 'black',fontSize:'16px' }}>
+            <Link style={{ textDecoration: 'none', color: 'black', fontSize: '16px' }}>
               Data Catalog Details
             </Link>
           </Breadcrumbs>
         </div>
-        
+
         <MaterialTable
+          components={{
+            Toolbar: (toolbarProps) => (
+              <Box >
+                <Tooltip title="Refresh" placement='top'>
+                  <Fab size="small" className={classes.button}
+                    onClick={getDataCatalogDetails}>
+                    <RefreshIcon />
+                  </Fab>
+                </Tooltip>
+                <MTableToolbar {...toolbarProps} />
+              </Box>
+            ),
+          }}
           isLoading={backdrop}
           icons={tableIcons}
           columns={columns}

@@ -14,6 +14,7 @@ const initialDataAttributes = {
     "file_encryption_ind": false, //default false
     "asset_owner": "",
     "support_cntct": "",
+    "derive_schema": false,
     "rs_load_ind": "", //default false
 }
 const initialIngestionAttributes = {
@@ -38,7 +39,9 @@ const initialColumnAttributes = [{
     "pk_ind": false,
     "data_type": "",
     "datetime_format": "",
-    "null_ind": false
+    "null_ind": false,
+    "customdatetime_format": "",
+    "customtargetdatetime_format": ""
 }]
 
 const dialogue = (state = { flag: false }, action) => {
@@ -85,10 +88,9 @@ const updateDataAssetTableData = (state = { data: [] }, action) => {
     }
 }
 
-
-const validateColumnAttribute = (state = {}, action) => {
+const columnAttributeError = (state = {data: {}}, action) => {
     switch (action.type) {
-        case Constants.VALIDATE_COLUMN_ATTRIBUTES_DATA:
+        case Constants.COLUMN_ATTRIBUTES_DATA_ERROR:
             return { ...state, data: action.payload }
         default:
             return { ...state }
@@ -132,7 +134,7 @@ const dataAssetsReducer = combineReducers({
     updateDataFlag,
     updateDataAssetTableData,
     updateSelectedRow,
-    validateColumnAttribute
+    columnAttributeError
 })
 
 export default dataAssetsReducer;

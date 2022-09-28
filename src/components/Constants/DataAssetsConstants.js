@@ -6,7 +6,8 @@ export const BOOLEAN_VALUES = [
 export const FILE_TYPE = [
     { name: 'CSV', value: 'csv' },
     { name: 'Parquet', value: 'parquet' },
-    { name: 'XML', value: 'xml' },
+    // { name: 'XML', value: 'xml' },
+    { name: 'ORC', value: 'orc' },
     { name: 'JSON', value: 'json' }
 ]
 

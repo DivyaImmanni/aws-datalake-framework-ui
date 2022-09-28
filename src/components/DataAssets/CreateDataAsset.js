@@ -14,7 +14,7 @@ import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ReplayIcon from '@material-ui/icons/Replay';
 import {
-    assetFieldValue, dataAssetFieldValue, dqRulesFieldValue, ingestionFieldValue, resetDataAssetValues, updateAllDataAssetValues, updateDataFlag, updateMode
+    columnAttributeError, assetFieldValue, dataAssetFieldValue, dqRulesFieldValue, ingestionFieldValue, resetDataAssetValues, updateAllDataAssetValues, updateDataFlag, updateMode
 } from 'actions/dataAssetActions';
 import { openSideBar, openSnackbar } from 'actions/notificationAction';
 import PageTitle from 'components/Common/PageTitle';
@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     formControl: {
-       // margin: theme.spacing(1),
+        // margin: theme.spacing(1),
         minWidth: 250,
         margin: '0px 3% 2% 0px',
         fontSize: 13,
@@ -105,7 +105,6 @@ const CreateDataAsset = (props) => {
     const [cronValue, setCronValue] = useState('');
     const [errorValue, setErrorValue] = useState('');
     const [error, setError] = useState({})
-    var [saveForm, setSaveForm] = useState(0);
 
     useEffect(() => {
         if (props.mode !== 'create') {
@@ -121,11 +120,13 @@ const CreateDataAsset = (props) => {
             if (obj && obj['ingstn_pattern'] === 'file') {
                 setDisplayField(true);
                 setSrcIngestionValue('file');
-                props.updateAllDataAssetValues({ ...props.fieldValues, "asset_info": { ...props.assetFieldValues, "file_type": "", "file_header": "", "multipartition": false, "file_delim": "" } })
+                const updateObj = props.mode === 'create' ? { ...props.fieldValues, "asset_info": { ...props.assetFieldValues, "file_type": "", "file_header": "", "multipartition": false, "file_delim": "" }} : {...props.fieldValues};
+                props.updateAllDataAssetValues(updateObj)
             } else {
                 setDisplayField(false);
                 setSrcIngestionValue(obj ? obj['ingstn_pattern'] : "")
-                props.updateAllDataAssetValues({ ...props.fieldValues, "asset_info": { ...props.assetFieldValues, "file_type": "csv", "file_header": "true", "multipartition": "", "file_delim": "," } })
+                const updateObj = props.mode === 'create' ? { ...props.fieldValues, "asset_info": { ...props.assetFieldValues, "file_type": "parquet", "file_header": "", "multipartition": "", "file_delim": "" } } : {...props.fieldValues};
+                props.updateAllDataAssetValues(updateObj)
             }
         }
     }, [props.assetFieldValues.src_sys_id])
@@ -258,6 +259,50 @@ const CreateDataAsset = (props) => {
         navigate("/data-assets");
     }
 
+
+    const isColumnAttributeValid = () => {
+        var fieldsToValidate = ["col_nm", "col_desc", "data_classification", "data_type",
+             "customdatetime_format",
+            "customtargetdatetime_format", "req_tokenization", "pk_ind"];
+        var newErrorObj = props.columnAttributeError;
+        props.columnAttributesData?.forEach(row => {
+            fieldsToValidate.forEach(field => {
+                // if data type is not Date time, no need to check datetime format field
+                // if ((field == "datetime_format" && row['data_type'] != "Datetime")) {
+                //     return;
+                // }
+                
+                // if data time format is not custom, no need to check custom datetime format field
+                if ((field == "customdatetime_format" && row['datetime_format'] != "custom")
+                    || (field == "customtargetdatetime_format" && row['tgt_datetime_format'] != "custom")) {
+                    return;
+                }
+                
+                var errorMessage = "";
+                errorMessage = row[`${field}`]?.toString().trim().length > 0
+                    ? ((props.columnAttributeError[`${row.col_id}`] && props.columnAttributeError[`${row.col_id}`][`${field}`]) || "")
+                    : "Required Field";
+
+                newErrorObj = { ...newErrorObj, [row.col_id]: { ...newErrorObj[`${row.col_id}`], [field]: errorMessage } }
+            })
+        })
+        props.setColumnAttributeError({ ...newErrorObj })
+
+        var isError = false;
+        for (var id in newErrorObj) {
+            for (var col in newErrorObj[`${id}`]) {
+                if (newErrorObj[`${id}`][`${col}`]) {
+                    isError = true;
+                    break;
+                }
+            }
+            if (isError) {
+                break;
+            }
+        }
+        return !isError;
+    }
+
     const validate = () => {
         let errorObj = {}
         errorObj = {
@@ -276,7 +321,6 @@ const CreateDataAsset = (props) => {
             triggerMechanismError: props.ingestionFieldValues.trigger_mechanism.trim() ? false : true,
             crontabError: props.ingestionFieldValues.trigger_mechanism === 'time_driven' ? (props.ingestionFieldValues.frequency.trim() ? error.crontabError : true) : false,
             extColumnError: false,
-            columnAttributeError: !props.isColumnAttributeValid
         }
         setError(errorObj);
         console.log("error obj", errorObj)
@@ -284,15 +328,31 @@ const CreateDataAsset = (props) => {
     }
 
     const handleSave = async () => {
-        console.log("field values", { ...props.fieldValues })
+        //console.log("field values", { ...props.fieldValues })
         let errorLength = validate();
-        setSaveForm(saveForm + 1)
-        console.log("isColumnAttributeValid from redux", props.isColumnAttributeValid)
-        if (errorLength) {
+        let errorInColumnAttribute = !props.assetFieldValues.derive_schema && !isColumnAttributeValid()
+        if (errorLength || errorInColumnAttribute) {
             props.openSnackbar({ variant: 'error', message: 'Enter all mandatory fields with valid data!' });
         } else {
             setDisableButton(true);
             let payload = props.mode === 'edit' ? { ...props.fieldValues, asset_id: props.assetFieldValues.asset_id, src_sys_id: props.assetFieldValues.src_sys_id } : { ...props.fieldValues }
+            if(props.assetFieldValues.derive_schema){
+                payload.asset_attributes = [];
+                props.assetFieldValues.derive_schema = true;
+            } else{
+                props.assetFieldValues.derive_schema = false;
+                payload.asset_attributes = payload.asset_attributes?.map(row => {
+                    if(row.datetime_format == 'custom'){                        
+                        row = { ...row, datetime_format: row.customdatetime_format }
+                    }
+                    if(row.tgt_datetime_format == 'custom'){                        
+                        row = { ...row, tgt_datetime_format: row.customtargetdatetime_format }
+                    }
+                    delete row.customdatetime_format;                                                
+                    delete row.customtargetdatetime_format;                        
+                    return row;
+                })
+            }
             // let payload = { ...props.fieldValues }
             let url = props.mode === 'edit' ? '/data_asset/update' : 'data_asset/create'
             try {
@@ -463,7 +523,7 @@ const CreateDataAsset = (props) => {
                                     </FormControl> */}
 
                                 </>}
-                                {displayField && props.assetFieldValues.file_type === 'csv' &&
+                            {displayField && props.assetFieldValues.file_type === 'csv' &&
                                 <>
 
                                     <FormControl className={classes.formControl}>
@@ -581,7 +641,7 @@ const CreateDataAsset = (props) => {
                         <Typography className={classes.heading}>Column Attributes</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                        <ColumnAttributes saveForm={saveForm}/>
+                        <ColumnAttributes />
                     </AccordionDetails>
                 </Accordion>
                 <Accordion style={{ margin: "1% 0" }}
@@ -631,7 +691,7 @@ const CreateDataAsset = (props) => {
                                         <MenuItem key="incremental" value="incremental">Incremental</MenuItem>
                                     </Select>
                                 </FormControl>}
-                                {srcIngestionValue === 'database' && props.ingestionFieldValues.ext_method === 'incremental' &&
+                            {srcIngestionValue === 'database' && props.ingestionFieldValues.ext_method === 'incremental' &&
                                 <FormControl className={classes.formControl}>
                                     <div style={{ marginBottom: '3%' }}>Extraction Column*</div>
                                     <Select
@@ -646,8 +706,8 @@ const CreateDataAsset = (props) => {
                                         <MenuItem value="">
                                             <em>Select extraction Column</em>
                                         </MenuItem>
-                                        {props.columnAttributesData.map(row=>{
-                                            if(row.data_type === 'Datetime'){
+                                        {props.columnAttributesData.map(row => {
+                                            if (row.data_type === 'Datetime') {
                                                 return <MenuItem key={row.col_nm} value={row.col_nm}>{row.col_nm}</MenuItem>
                                             }
                                         })
@@ -668,9 +728,9 @@ const CreateDataAsset = (props) => {
                                         onChange={(event) => handleValueChange(props.ingestionFieldValue, 'src_sql_query', 'sourceSqlQueryError', event.target.value)}
                                     />
                                 </FormControl>} */}
-                            {props.mode !== 'create' && srcIngestionValue !== 'database' &&
+                            {props.mode !== 'create' && props.mode !== 'clone' && srcIngestionValue !== 'database' &&
                                 <FormControl className={classes.formControl}>
-                                    <div > Ingestion Source Path* </div>
+                                    <div> Ingestion Source Path* </div>
                                     <TextField
                                         error={error.ingestionSourcePathError}
                                         disabled={disableButton || props.mode === 'edit'}
@@ -719,6 +779,7 @@ const CreateDataAsset = (props) => {
                                         />
                                     </FormControl>
                                 </Tooltip>}
+
                         </div>
                     </AccordionDetails>
                 </Accordion>
@@ -775,7 +836,7 @@ const mapStateToProps = state => ({
     mode: state.dataAssetState.updateMode.mode,
     dataFlag: state.dataAssetState.updateDataFlag.dataFlag,
     selectedRow: state.dataAssetState.updateSelectedRow,
-    isColumnAttributeValid: state.dataAssetState.validateColumnAttribute?.data
+    columnAttributeError: state.dataAssetState.columnAttributeError.data
 })
 const mapDispatchToProps = dispatch => bindActionCreators({
     openSnackbar,
@@ -787,7 +848,8 @@ const mapDispatchToProps = dispatch => bindActionCreators({
     assetFieldValue,
     ingestionFieldValue,
     dqRulesFieldValue,
-    openSideBar
+    openSideBar,
+    setColumnAttributeError: columnAttributeError
 }, dispatch)
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateDataAsset);

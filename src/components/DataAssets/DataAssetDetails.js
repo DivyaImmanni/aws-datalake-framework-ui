@@ -10,7 +10,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import Close from '@material-ui/icons/Close';
-import { dqRulesFieldValue, updateAllDataAssetValues, updateMode } from 'actions/dataAssetActions';
+import { dqRulesFieldValue, updateAllDataAssetValues, updateMode, resetDataAssetValues } from 'actions/dataAssetActions';
 import { openSideBar, openSnackbar } from 'actions/notificationAction';
 import PageTitle from 'components/Common/PageTitle';
 import ColumnAttributes from 'components/DataAssets/ColumnAttributes';
@@ -91,7 +91,7 @@ const DataAssetDetails = (props) => {
   const [srcIngestionValue, setSrcIngestionValue] = useState('');
   const [backdrop, setBackdrop] = useState(false);
   const [displayDeleteDialog, setDisplayDeleteDialog] = useState(false);
-  const {src_sys_id} = useParams();
+  const { src_sys_id } = useParams();
 
   useEffect(() => {
     getSourceSystemData();
@@ -120,8 +120,13 @@ const DataAssetDetails = (props) => {
     setBackdrop(true);
     defaultInstance.post('/data_asset/read', { "asset_id": props.selectedRow.asset_id, "src_sys_id": props.selectedRow.src_sys_id })
       .then(response => {
-        props.updateAllDataAssetValues({ ...response.data.responseBody });
-        setBackdrop(false);
+        if (response.data.responseStatus) {
+          props.updateAllDataAssetValues({ ...response.data.responseBody });
+          setBackdrop(false);
+        } else {
+          props.resetDataAssetValues();
+          navigate("/data-assets");
+        }
       })
       .catch(error => {
         console.log("error", error)
@@ -281,7 +286,7 @@ const DataAssetDetails = (props) => {
             <TabPanel>
               <div style={{ border: '1px solid #CBCBCB' }}>
                 <div style={{ marginLeft: '3%', paddingTop: 10 }}>
-                {srcIngestionValue === 'database' &&
+                  {srcIngestionValue === 'database' &&
                     <>
                       <FormControl className={classes.formControl}>
                         <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
@@ -297,38 +302,39 @@ const DataAssetDetails = (props) => {
                       </FormControl> */}
                       <FormControl className={classes.formControl}>
                         <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-                        Extraction Method
+                          Extraction Method
                         </div>
                         <div>{props.ingestionFieldValues.ext_method}</div>
                       </FormControl>
                       {srcIngestionValue === 'database' && props.ingestionFieldValues.ext_method === 'incremental' &&
-                      <FormControl className={classes.formControl}>
-                        <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-                        Extraction Column
-                        </div>
-                        <div>{props.ingestionFieldValues.ext_col}</div>
-                      </FormControl>}
-                      </>
+                        <FormControl className={classes.formControl}>
+                          <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                            Extraction Column
+                          </div>
+                          <div>{props.ingestionFieldValues.ext_col}</div>
+                        </FormControl>}
+                    </>
                   }
                   {srcIngestionValue !== 'database' &&
-                   <FormControl className={classes.formControl}>
-                        <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-                          Ingestion Source Path
-                        </div>
-                        <div>{props.ingestionFieldValues.ingstn_src_path}</div>
-                      </FormControl>}
+                    <FormControl className={classes.formControl}>
+                      <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                        Ingestion Source Path
+                      </div>
+                      <div>{props.ingestionFieldValues.ingstn_src_path}</div>
+                    </FormControl>}
                   <FormControl className={classes.formControl}>
                     <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
                       Trigger Mechanism
                     </div>
                     <div>{props.ingestionFieldValues.trigger_mechanism}</div>
                   </FormControl>
+                  {props.ingestionFieldValues.trigger_mechanism === 'time_driven' &&
                   <FormControl className={classes.formControl}>
                     <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
                       Frequency
                     </div>
                     <div>{props.ingestionFieldValues.frequency}</div>
-                  </FormControl>
+                  </FormControl>}
                 </div>
               </div>
             </TabPanel>
@@ -363,17 +369,17 @@ const DataAssetDetails = (props) => {
         </div>
       </div>
       <Dialog open={displayDeleteDialog} fullWidth classes={{ paperFullWidth: classes.dialogCustomizedWidth }}>
-        <DialogContent  style={{fontSize:'16px',textAlign:'center'}}>
-          <div style={{padding:'4% 0% 2%'}}>
-          Are you sure you want to delete data asset ID?
+        <DialogContent style={{ fontSize: '16px', textAlign: 'center' }}>
+          <div style={{ padding: '4% 0% 2%' }}>
+            Are you sure you want to delete data asset ID?
           </div>
-           <div style={{ color:'#E26C45',paddingBottom:'2%'}}>{props.assetFieldValues.asset_id}</div> 
+          <div style={{ color: '#E26C45', paddingBottom: '2%' }}>{props.assetFieldValues.asset_id}</div>
         </DialogContent>
-        <DialogActions style={{ justifyContent:'center'}}>
-          <Button onClick={()=> setDisplayDeleteDialog(false)} className={classes.button} style={{ backgroundColor: '#A3A3A390', minWidth:'100px' }}>
-           <span style={{padding:'0% 5%'}}>Cancel</span> 
+        <DialogActions style={{ justifyContent: 'center' }}>
+          <Button onClick={() => setDisplayDeleteDialog(false)} className={classes.button} style={{ backgroundColor: '#A3A3A390', minWidth: '100px' }}>
+            <span style={{ padding: '0% 5%' }}>Cancel</span>
           </Button>
-          <Button onClick={handleDelete} className={classes.button} style={{minWidth:'100px'}} autoFocus>
+          <Button onClick={handleDelete} className={classes.button} style={{ minWidth: '100px' }} autoFocus>
             Confirm
           </Button>
         </DialogActions>
@@ -395,7 +401,8 @@ const mapDispatchToProps = dispatch => bindActionCreators({
   openSnackbar,
   openSideBar,
   dqRulesFieldValue,
-  updateAllDataAssetValues
+  updateAllDataAssetValues,
+  resetDataAssetValues
 }, dispatch)
 
 export default connect(mapStateToProps, mapDispatchToProps)(DataAssetDetails);

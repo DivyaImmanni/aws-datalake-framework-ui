@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     'min-height': '450px'
   },
   formControl: {
-    minWidth: '25%',
+    minWidth: '28%',
     margin: 15,
     fontSize: 14,
     wordBreak: 'break-word',

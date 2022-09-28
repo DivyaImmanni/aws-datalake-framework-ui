@@ -82,15 +82,15 @@ const ViewCatalog = (props) => {
                 </FormControl>
                 <FormControl className={classes.formControl}>
                   <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-                    Publish Indicator
+                    Masking Indicator
                   </div>
-                  <div>{props.fieldValues.data_publish}</div>
+                  <div>{props.fieldValues.data_masking}</div>
                 </FormControl>
                 <FormControl className={classes.formControl}>
                   <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-                    Masking
+                    Publish Indicator
                   </div>
-                  <div>{props.fieldValues.data_masking}</div>
+                  <div>{props.fieldValues.data_publish}</div>
                 </FormControl>
                 <FormControl className={classes.formControl}>
                   <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
@@ -100,15 +100,15 @@ const ViewCatalog = (props) => {
                 </FormControl>
                 <FormControl className={classes.formControl}>
                   <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-                    Publish Execution ID
-                  </div>
-                  <div>{props.fieldValues.data_publish_exec_id}</div>
-                </FormControl>
-                <FormControl className={classes.formControl}>
-                  <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
                     Masking Execution ID
                   </div>
                   <div>{props.fieldValues.data_masking_exec_id}</div>
+                </FormControl>
+                <FormControl className={classes.formControl}>
+                  <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                    Publish Execution ID
+                  </div>
+                  <div>{props.fieldValues.data_publish_exec_id}</div>
                 </FormControl>
                 <FormControl className={classes.formControl}>
                   <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
