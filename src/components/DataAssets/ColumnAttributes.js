@@ -80,9 +80,10 @@ const ColumnAttributes = (props) => {
     const [checkDisable, setCheckDisable] = useState(false);
 
     const handleChangeBox = () => {
-        setCheckDisable(!props.assetFieldValues.derive_schema)
+        var deriveSchema = props.assetFieldValues.derive_schema?.toString() == "true";
+        setCheckDisable(!deriveSchema)
         props.columnAttributeError({})
-        props.assetFieldValue("derive_schema", !props.assetFieldValues.derive_schema)
+        props.assetFieldValue("derive_schema", !deriveSchema)
         console.log(checkDisable);
     }
 
@@ -130,7 +131,7 @@ const ColumnAttributes = (props) => {
             
         })
         setExpanded(0)
-        setCheckDisable(props.assetFieldValues.derive_schema)
+        setCheckDisable(props.assetFieldValues.derive_schema?.toString() == "true")
     }, []);
 
     const handleChange = (row, id) => (_, isExpanded) => {
@@ -223,7 +224,7 @@ const ColumnAttributes = (props) => {
                 <Box className={classes.formControlLabel}>
                         <Box>
                             <FormControlLabel label=" Derive Schema" disabled={disableButton}
-                                control={<Checkbox checked={props.assetFieldValues.derive_schema} onChange={handleChangeBox} />}
+                                control={<Checkbox checked={props.assetFieldValues.derive_schema?.toString() == "true"} onChange={handleChangeBox} />}
                             />
                         </Box>
                     </Box>
