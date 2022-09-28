@@ -267,10 +267,6 @@ const CreateDataAsset = (props) => {
         var newErrorObj = props.columnAttributeError;
         props.columnAttributesData?.forEach(row => {
             fieldsToValidate.forEach(field => {
-                // if data type is not Date time, no need to check datetime format field
-                // if ((field == "datetime_format" && row['data_type'] != "Datetime")) {
-                //     return;
-                // }
                 
                 // if data time format is not custom, no need to check custom datetime format field
                 if ((field == "customdatetime_format" && row['datetime_format'] != "custom")
@@ -330,17 +326,18 @@ const CreateDataAsset = (props) => {
     const handleSave = async () => {
         //console.log("field values", { ...props.fieldValues })
         let errorLength = validate();
-        let errorInColumnAttribute = !props.assetFieldValues.derive_schema && !isColumnAttributeValid()
+        var deriveSchema = props.assetFieldValues.derive_schema?.toString() == "true";        
+        let errorInColumnAttribute = !deriveSchema && !isColumnAttributeValid()
         if (errorLength || errorInColumnAttribute) {
             props.openSnackbar({ variant: 'error', message: 'Enter all mandatory fields with valid data!' });
         } else {
             setDisableButton(true);
             let payload = props.mode === 'edit' ? { ...props.fieldValues, asset_id: props.assetFieldValues.asset_id, src_sys_id: props.assetFieldValues.src_sys_id } : { ...props.fieldValues }
-            if(props.assetFieldValues.derive_schema){
+            if(deriveSchema){
                 payload.asset_attributes = [];
-                props.assetFieldValues.derive_schema = true;
+                payload.asset_info.derive_schema = true;
             } else{
-                props.assetFieldValues.derive_schema = false;
+                payload.asset_info.derive_schema = false;
                 payload.asset_attributes = payload.asset_attributes?.map(row => {
                     if(row.datetime_format == 'custom'){                        
                         row = { ...row, datetime_format: row.customdatetime_format }
