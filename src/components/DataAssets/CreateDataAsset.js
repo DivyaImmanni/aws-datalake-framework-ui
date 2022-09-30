@@ -120,12 +120,12 @@ const CreateDataAsset = (props) => {
             if (obj && obj['ingstn_pattern'] === 'file') {
                 setDisplayField(true);
                 setSrcIngestionValue('file');
-                const updateObj = props.mode === 'create' ? { ...props.fieldValues, "asset_info": { ...props.assetFieldValues, "file_type": "", "file_header": "", "multipartition": false, "file_delim": "" }} : {...props.fieldValues};
+                const updateObj = (props.mode === 'create' || props.mode === 'clone') ? { ...props.fieldValues, "asset_info": { ...props.assetFieldValues, "file_type": "", "file_header": "", "multipartition": false, "file_delim": "" }} : {...props.fieldValues};
                 props.updateAllDataAssetValues(updateObj)
             } else {
                 setDisplayField(false);
                 setSrcIngestionValue(obj ? obj['ingstn_pattern'] : "")
-                const updateObj = props.mode === 'create' ? { ...props.fieldValues, "asset_info": { ...props.assetFieldValues, "file_type": "parquet", "file_header": "", "multipartition": "", "file_delim": "" } } : {...props.fieldValues};
+                const updateObj = (props.mode === 'create' || props.mode === 'clone') ? { ...props.fieldValues, "asset_info": { ...props.assetFieldValues, "file_type": "parquet", "file_header": "", "multipartition": "", "file_delim": "" } } : {...props.fieldValues};
                 props.updateAllDataAssetValues(updateObj)
             }
         }
