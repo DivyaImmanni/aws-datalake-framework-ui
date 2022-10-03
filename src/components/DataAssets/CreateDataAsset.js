@@ -21,7 +21,7 @@ import PageTitle from 'components/Common/PageTitle';
 import { BOOLEAN_VALUES, FILE_TYPE } from 'components/Constants/DataAssetsConstants';
 import ColumnAttributes from 'components/DataAssets/ColumnAttributes';
 import cron from 'cron-validate';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Editor from "react-prism-editor";
 import { connect } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
@@ -106,15 +106,36 @@ const CreateDataAsset = (props) => {
     const [errorValue, setErrorValue] = useState('');
     const [error, setError] = useState({})
 
+    const previousValues = useRef({ sourceSysData});
     useEffect(() => {
         if (props.mode !== 'create') {
             fetchDataAssetDetails();
         }
         getSourceSystemData();
+        // .then(res => {
+        //     onSourceSystemSelection(res);
+        //     console.log(res);
+        // })
         getTargetSystemData();
     }, [])
 
     useEffect(() => {
+        if(previousValues.current.sourceSysData?.length !== sourceSysData?.length){
+            onSourceSystemSelection(sourceSysData);
+        }
+    }, [props.assetFieldValues.src_sys_id, sourceSysData])
+
+    useEffect(() => {
+        if (srcIngestionValue === 'file') {
+            if (props.assetFieldValues.file_type === 'csv') {
+                props.updateAllDataAssetValues({ ...props.fieldValues, "asset_info": { ...props.assetFieldValues, "file_header": true, "file_delim": "," } })
+            } else {
+                props.updateAllDataAssetValues({ ...props.fieldValues, "asset_info": { ...props.assetFieldValues, "file_header": "", "file_delim": "" } })
+            }
+        }
+    }, [props.assetFieldValues.file_type])
+
+    const onSourceSystemSelection = (sourceSysData) => {
         if (sourceSysData.length > 0) {
             let obj = sourceSysData.find(element => element.src_sys_id === props.assetFieldValues.src_sys_id)
             if (obj && obj['ingstn_pattern'] === 'file') {
@@ -129,25 +150,16 @@ const CreateDataAsset = (props) => {
                 props.updateAllDataAssetValues(updateObj)
             }
         }
-    }, [props.assetFieldValues.src_sys_id])
-
-    useEffect(() => {
-        if (srcIngestionValue === 'file') {
-            if (props.assetFieldValues.file_type === 'csv') {
-                props.updateAllDataAssetValues({ ...props.fieldValues, "asset_info": { ...props.assetFieldValues, "file_header": true, "file_delim": "," } })
-            } else {
-                props.updateAllDataAssetValues({ ...props.fieldValues, "asset_info": { ...props.assetFieldValues, "file_header": "", "file_delim": "" } })
-            }
-        }
-    }, [props.assetFieldValues.file_type])
-
+    }
     const getSourceSystemData = () => {
-        defaultInstance.post('/source_system/read?tasktype=read', { "fetch_limit": 'all', "src_config": { "src_sys_id": null } })
+        return defaultInstance.post('/source_system/read?tasktype=read', { "fetch_limit": 'all', "src_config": { "src_sys_id": null } })
             .then(response => {
                 if (response.data.responseStatus) {
                     setSourceSysData(response.data.responseBody);
+                    return response.data.responseBody;
                 } else {
                     setSourceSysData([]);
+                    return [];
                 }
             })
             .catch(error => {
