@@ -810,8 +810,8 @@ const CreateDataAsset = (props) => {
                         <Editor
                             language={'jsx'}
                             theme={'default'}
-                            code={props.dqRulesFieldValues?.join('\n') || ""}
-                            lineNumber={true}
+                            code={props.dqRulesFieldValues?.join('\n') || "\n\n\n"}
+                            lineNumber={props.dqRulesFieldValues?.length > 0}
                             readOnly={false}
                             clipboard={true}
                             showLanguage={true}
