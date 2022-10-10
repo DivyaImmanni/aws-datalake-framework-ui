@@ -16,7 +16,7 @@ import {
     dataAssetFieldValue, resetDataAssetValues, updateAllDataAssetValues, updateDataFlag, updateMode
 } from 'actions/dataAssetActions';
 import { openSnackbar } from 'actions/notificationAction';
-import { BOOLEAN_VALUES, DATA_CLASSIFICATION, DATE_TIME_FORMATS, TARGET_DATA_TYPE } from 'components/Constants/DataAssetsConstants';
+import { BOOLEAN_VALUES, DATA_CLASSIFICATION, DATE_TIME_FORMATS, TARGET_DATA_TYPE, DATA_TYPES } from 'components/Constants/DataAssetsConstants';
 import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
@@ -152,7 +152,11 @@ const ColumnAttributes = (props) => {
     const handleValueChange = (row, field, value, validator = { required: true }) => {
         let info = props.columnAttributesData;
         let indexValue = findIndexofObject(row);
-        info.splice(indexValue, 1, { ...row, [field]: value })
+        if (field == 'data_type') {
+            info.splice(indexValue, 1, { ...row, [field]: value, 'tgt_data_type': '' })
+        } else {
+            info.splice(indexValue, 1, { ...row, [field]: value })
+        }
         props.columnFieldValue([...info]);
         var errorMessage = "";
         if (validator?.required) {
@@ -305,7 +309,7 @@ const ColumnAttributes = (props) => {
                                         <MenuItem value="">
                                             <em>Select data type</em>
                                         </MenuItem>
-                                        {TARGET_DATA_TYPE.map(item => {
+                                        {DATA_TYPES.map(item => {
                                             return <MenuItem key={item.value} value={item.value}>{item.name}</MenuItem>
                                         })}
                                     </Select>
@@ -440,14 +444,14 @@ const ColumnAttributes = (props) => {
                                         <MenuItem value="">
                                             <em>Select target data type</em>
                                         </MenuItem>
-                                        {TARGET_DATA_TYPE.map(item => {
+                                        {DATA_TYPES.find(d => d.value == row.data_type)?.targetDataType.map(item => {
                                             return <MenuItem key={item.value} value={item.value}>{item.name}</MenuItem>
                                         })}
                                     </Select>
                                 </FormControl>
                                 {row.tgt_data_type === "Datetime" &&
                                     <FormControl className={classes.formControl}>
-                                        <div style={{ marginBottom: '3%' }}>Target Datetime Format*</div>
+                                        <div style={{ marginBottom: '3%' }}>Target Datetime Format</div>
                                         <Select
                                             // error={Boolean(props.error[`${row.col_id}`]?.tgt_datetime_format)}
                                             disabled={disableButton || checkDisable}

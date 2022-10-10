@@ -21,6 +21,44 @@ export const TARGET_DATA_TYPE = [
     { name: 'String', value: 'String' },  
 ]
 
+export const DATA_TYPES = [
+    {
+        name: 'Boolean', value: 'Boolean',
+        targetDataType: [{ name: 'Boolean', value: 'Boolean' }]
+    },
+    {
+        name: 'Datetime', value: 'Datetime',
+        targetDataType: [
+            { name: 'Datetime', value: 'Datetime' },
+            { name: 'String', value: 'String' }]
+    },
+    {
+        name: 'Double', value: 'Double',
+        targetDataType: [
+            { name: 'Double', value: 'Double' },
+            { name: 'String', value: 'String' }]
+    },
+    {
+        name: 'Integer', value: 'Integer',
+        targetDataType: [
+            { name: 'Integer', value: 'Integer' },
+            { name: 'Long', value: 'Long' },
+            { name: 'Double', value: 'Double' },
+            { name: 'String', value: 'String' }]
+    },
+    {
+        name: 'Long', value: 'Long',
+        targetDataType: [
+            { name: 'Long', value: 'Long' },
+            { name: 'Double', value: 'Double' },
+            { name: 'String', value: 'String' }]
+    },
+    {
+        name: 'String', value: 'String',
+        targetDataType: [{ name: 'String', value: 'String' }]
+    },
+];
+
 export const DATA_CLASSIFICATION = [
     { name: 'Public', value: 'public' },
     { name: 'Internal', value: 'internal' },
