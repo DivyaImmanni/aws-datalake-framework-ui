@@ -1,38 +1,51 @@
-import { CssBaseline, Tooltip } from "@material-ui/core";
+import React from "react";
+import { Link } from 'react-router-dom';
+import PropTypes from "prop-types";
+import classNames from "classnames";
+import { withStyles } from "@material-ui/core/styles";
+import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
-import { bindActionCreators } from 'redux';
-import { makeStyles } from '@material-ui/core/styles';
 import Toolbar from "@material-ui/core/Toolbar";
+import List from "@material-ui/core/List";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import IconButton from "@material-ui/core/IconButton";
+import MenuIcon from "@material-ui/icons/Menu";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import StorageIcon from '@material-ui/icons/Storage';
+import HomeIcon from '@material-ui/icons/Home';
+import LayersIcon from '@material-ui/icons/Layers';
+import DomainIcon from '@material-ui/icons/Domain';
 import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew';
-import { setAuthentication } from 'actions/authenticationAction';
-import SideBarComponent from "components/Notifications/SideBarComponent";
 import SnackbarComponent from 'components/Notifications/SnackBarComponent';
-import logo from 'images/logo white.png';
-import React, { useEffect, useState } from "react";
-import { connect } from 'react-redux';
-import { Link, useLocation } from 'react-router-dom';
 import Main from 'routes/Main';
+import { Tooltip } from "@material-ui/core";
+import logo from 'images/logo white.png';
 
-const useStyles = makeStyles((theme) => ({
-    logo: {
-        display:'flex',
-        fontSize: '23px',
-        cursor: "pointer",
-        marginRight: theme.spacing(5),
-        textDecoration: "none",
-        color: "white",
-        alignItems: 'flex-start',
-        padding:'20px',
-        flexGrow:1
-    },
-    link: {
-        textDecoration: "none",
-        color: "gray",
-        fontSize: "13px",
-        margin: theme.spacing(2),
-        "&:hover": {
-            color: "#fffc"
+
+const drawerWidth = 220;
+
+const styles = theme => ({
+    root: {
+        display: 'flex',
+        '&$selected': {
+            backgroundColor: 'white',
+            "& .MuiListItemIcon-root": {
+                color: "black",
+            },
+            '&:hover': {
+                backgroundColor: '#f59e0b',
+                color: 'white',
+                "& .MuiListItemIcon-root": {
+                    color: "white"
+                }
+            }
         },
+    },
+    selected: {},
+    appBar: {
+        zIndex: theme.zIndex.drawer + 1
     },
     pipe: {
         position: "relative",
@@ -47,81 +60,208 @@ const useStyles = makeStyles((theme) => ({
             "background": "#f7901d",
             "left": "0px"
         }
-    }
-}));
-
-const Layout = (props) => {
-    const classes = useStyles();
-    const [activePageIndex, setActivePageIndex] = useState(0);
-    
-    const location = useLocation();
-    const { pathname } = location;
-    const handleOnclick = (index) => {
-        setActivePageIndex(index);
-    }
-    const listOfNavItems = [
-        { name: 'Home', icon: <i class="fas fa-layer-group fa-lg"></i>, url: '/' },
-        { name: 'Source Systems', icon: <i class="fas fa-layer-group fa-lg"></i>, url: '/source-systems' },
-        { name: 'Data Assets', icon: <i class="fas fa-database fa-lg"></i>, url: '/data-assets' },
-        { name: 'Lake Destinations', icon: <i class="fas fa-warehouse fa-lg"></i>, url: '/lake-destinations' }
-    ]
-    
-    useEffect(() => {
-        listOfNavItems.forEach((nav, i) => {
-            if(pathname.includes(nav.url)){
-                setActivePageIndex(i);
-            }
+    },
+    logo: {
+        display: 'flex',
+        fontSize: '23px',
+        cursor: "pointer",
+        marginRight: theme.spacing(5),
+        textDecoration: "none",
+        color: "white",
+        alignItems: 'flex-start',
+        padding: '20px',
+        flexGrow: 1
+    },
+    appBarShift: {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create(["width", "margin"], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen
         })
-    });
+    },
+    menuButton: {
+        marginLeft: 12,
+        marginRight: 36
+    },
+    menuButtonIconClosed: {
+        transition: theme.transitions.create(["transform"], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen
+        }),
+        transform: "rotate(0deg)"
+    },
+    menuButtonIconOpen: {
+        transition: theme.transitions.create(["transform"], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen
+        }),
+        transform: "rotate(180deg)"
+    },
+    hide: {
+        display: "none"
+    },
+    drawer: {
+        width: drawerWidth,
+        flexShrink: 0,
+        whiteSpace: "nowrap"
+    },
+    drawerOpen: {
+        width: drawerWidth,
+        transition: theme.transitions.create("width", {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen
+        })
+    },
+    drawerClose: {
+        transition: theme.transitions.create("width", {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen
+        }),
+        overflowX: "hidden",
+        width: theme.spacing.unit * 7 + 1,
+        [theme.breakpoints.up("sm")]: {
+            width: theme.spacing.unit * 9 + 1
+        }
+    },
+    toolbar: {
+        display: "flex",
+        alignItems: "center",
+        marginTop: theme.spacing.unit,
+        justifyContent: "flex-end",
+        padding: "0 8px",
+        ...theme.mixins.toolbar
+    },
+    content: {
+        flexGrow: 1,
+        padding: theme.spacing.unit * 3
+    },
+    grow: {
+        flexGrow: 1
+    },
+    imgResponsive: {
+        maxWidth: '80%',
+    },
+    text: {
+        flexGrow: 1,
+        textAlign: "center",
+    },
+    link: {
+        textDecoration: "none",
+        color: "inherit"
+    }
+});
 
-    return (
-        <div className={classes.root}>
-            <CssBaseline />
-            {activePageIndex !== 0 ? 
-            <AppBar position="sticky" style={{padding: '15px 5px'}}>
+class Layout extends React.Component {
+    state = {
+        open: true,
+        anchorEl: null
+    };
+
+    handleDrawerOpen = () => {
+        this.setState({ open: !this.state.open });
+    };
+
+    handleDrawerClose = () => {
+        this.setState({ open: false });
+    };
+
+    handleMenu = event => {
+        this.setState({ anchorEl: event.currentTarget });
+    };
+    handleClose = () => {
+        this.setState({ anchorEl: null });
+    };
+
+    render() {
+        const { classes, theme } = this.props;
+        const { anchorEl } = this.state;
+        const open = Boolean(anchorEl);
+        const listOfOptions = [
+            { name: 'Home', icon: <HomeIcon></HomeIcon>, url: '/' },
+            { name: 'Source Systems', icon: <LayersIcon></LayersIcon>, url: '/source-systems' },
+            { name: 'Data Assets', icon: <StorageIcon></StorageIcon>, url: '/data-assets' },
+            { name: 'Lake Destinations', icon: <DomainIcon></DomainIcon>, url: '/lake-destinations' }
+    ];
+
+        return (
+            <div className={classes.root}>
                 <CssBaseline />
-                {/* <Toolbar style={{ backgroundImage: `url("${HeaderBackground}")` }}> */}
-                <Toolbar style={{ backgroundColor: 'black',display:'flex', justifyContent:'space-between' }}>
-                    {/* <div>
-                            <img src={logo}  style={{maxWidth: '5%'}}/>
-                        </div> */}
-                    <Link to="/" className={classes.logo}>
-                        <img src={logo}  style={{maxWidth: '120px'}}/> <span className={classes.pipe}></span>  
-                        <span style={{ margin: '0 7px'}}>AWS </span> DATA LAKE
-                    </Link>
-                    <div >
-                        {listOfNavItems.map((item,index) => {
-                            return <Link key={index} to={item.url} className={classes.link} style={index === activePageIndex ? {'paddingBottom': 8, 'borderBottom':'4px solid #F7901D', color: 'white'}:{}} onClick={()=>handleOnclick(index)}>{item.name} </Link>
-                        })}
-                    </div>
-                    <span style={{padding:'25px 0px 20px 10px', color: '#F7901D', cursor:'pointer'}}> <Tooltip title="log out" placement='top'>
-                        <PowerSettingsNewIcon onClick={() => props.setAuthentication({})} />
-                    </Tooltip></span>
-                </Toolbar>
-            </AppBar>: ''}
-            <main className={classes.content} style={{marginBottom:20, display: "flex"}}>
-                {/* <Toolbar /> */}
-                <div style={props.openSideBar ? {width: 'calc(100% - 200px)'} : {width: '100%'}}>
-                    <Main/>
-                </div>
-                <SideBarComponent />
-                <SnackbarComponent />
-            </main>
-            {/* <AppBar position="static">
-                <CssBaseline />
-                <Toolbar>
-                    <div style={{ margin: 'auto'}}>
-                    Copyright © 2022, Tiger Analytics Inc. All rights reserved.
-                    </div>
-                </Toolbar>
-            </AppBar> */}
-        </div>
-    );
+                <AppBar
+                    position="fixed"
+                    className={classes.appBar}
+                    foojon={classNames(classes.appBar, {
+                        [classes.appBarShift]: this.state.open
+                    })}
+                >
+                    <Toolbar style={{ position: 'relative' }} disableGutters={true}>
+                        <IconButton
+                            color="inherit"
+                            aria-label="Open drawer"
+                            onClick={this.handleDrawerOpen}
+                        >
+                            <MenuIcon
+                                classes={{
+                                    root: this.state.open
+                                        ? classes.menuButtonIconOpen
+                                        : classes.menuButtonIconClosed
+                                }}
+                            />
+                        </IconButton>
+                        <Link to="/" className={classes.logo}>
+                            <img src={logo} style={{ maxWidth: '120px' }} />
+                            <span className={classes.pipe}></span>
+                            <span style={{ margin: '0 7px' }}>AWS </span> DATA LAKE
+                        </Link>                      
+                        <div style={{ position: 'absolute', marginTop: '5px', right: '75px',cursor: 'pointer' }}>
+                            <Tooltip title="log out">
+                                <PowerSettingsNewIcon onClick={() => this.props.setAuthentication(false)} />
+                            </Tooltip>
+                        </div>
+                    </Toolbar>
+                </AppBar>
+                <Drawer
+                    variant="permanent"
+                    className={classNames(classes.drawer, {
+                        [classes.drawerOpen]: this.state.open,
+                        [classes.drawerClose]: !this.state.open
+                    })}
+                    classes={{
+                        paper: classNames({
+                            [classes.drawerOpen]: this.state.open,
+                            [classes.drawerClose]: !this.state.open
+                        })
+                    }}
+                    open={this.state.open}
+                >
+                    <div className={classes.toolbar} />
+                    <List className={classes.list}>
+                        {listOfOptions.map((list, index) => (
+                            <Link to={list.url} className={classes.link}>
+                                <Tooltip title={this.state.open ? '' : list.name}>
+                                    <ListItem button classes={{ root: classes.root, selected: classes.selected }}
+                                        selected key={index}>
+                                        <ListItemIcon className={classes.root}>{list.icon}</ListItemIcon>
+                                        <ListItemText primary={list.name} />
+                                    </ListItem>
+                                </Tooltip>
+                            </Link>
+                        ))}
+                    </List>
+                </Drawer>
+                <main className={classes.content}>
+                    <Toolbar />
+                    <Main />
+                    <SnackbarComponent />
+                </main>
+            </div>
+        );
+    }
 }
-const mapStateToProps = state => ({
-    openSideBar: state.notificationState.openSideBar.open
-})
-const mapDispatchToProps = dispatch => bindActionCreators({
-    setAuthentication,
-}, dispatch)
-export default connect(mapStateToProps, mapDispatchToProps)(Layout);
+
+Layout.propTypes = {
+    classes: PropTypes.object.isRequired,
+    theme: PropTypes.object.isRequired
+};
+
+export default withStyles(styles, { withTheme: true })(Layout);
