@@ -9,6 +9,8 @@ import SourceSystems from 'components/SourceSystems';
 import CreateSourceSystem from 'components/SourceSystems/CreateSourceSystem';
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import Test from './../components/Test/Test';
+
 
 const Page = props =>(
     <Routes>
@@ -25,13 +27,31 @@ const Page = props =>(
         <Route path="/lake-destinations" element={<LakeDestination/>}/>
         <Route path="/lake-destinations/create" element={<CreateLakeDestination/>}/>
         <Route path="/lake-destinations/edit" element={<CreateLakeDestination/>}/>
+        <Route path="/collections" element={<Test title={'Collections'}/>}/>
+        <Route path="/asim-rules" element={<Test title={'ASIM Rules'}/>}/>
+        <Route path="/db-connectors" element={<Test title={'DB Connectors'}/>}/>
+
+        <Route path="/pipelines">
+            <Route  path="" element={<Test title={'Pipelines'}/>}/>
+            <Route index path="pipelines" element={<Test title={'Pipelines'}/>}/>
+            <Route path="execution" element={<Test title={'Pipelines Execution'}/>}/>
+        </Route>
+
+        <Route path="/audit">
+            <Route index path="" element={<Test title={'DQ Results'}/>}/>
+            <Route path="dq-results" element={<Test title={'DQ Results'}/>}/>
+            <Route path="reports" element={<Test title={'Reports and Dashboard'}/>}/>
+        </Route>
+
+        <Route path="/deployment" element={<Test title={'Deployment'}/>}/>        
+
         <Route path="*" element={<Navigate to="/" />}/>
     </Routes>
 )
 
 const Main = (props) => {
     return (
-        <div>
+        <div style={props.style}>
             <Page />
         </div>
     )

@@ -6,10 +6,15 @@ import PageTitle from 'components/Common/PageTitle';
 import SearchBar from 'components/Common/SearchBar';
 import tableIcons from "components/MetaData/MaterialTableIcons";
 import ViewSourceSystem from 'components/SourceSystems/ViewSourceSystem';
-import clone from 'images/clone.png';
-import edit from 'images/edit.png';
-import remove from 'images/Remove.png';
-import show from 'images/Show.png';
+// import clone from 'images/clone.png';
+// import edit from 'images/edit.png';
+// import remove from 'images/Remove.png';
+// import show from 'images/Show.png';
+import Fab from '@material-ui/core/Fab';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 import MaterialTable from "material-table";
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
@@ -157,7 +162,13 @@ const SourceSystems = (props) => {
           data={filteredList}
           actions={[
             {
-              icon: () => <img src={show} alt="view" style={{ maxWidth: '70%' }} />,
+              // icon: () => <img src={show} alt="view" style={{ maxWidth: '70%' }} />,
+              // tooltip: 'View',
+              // position: 'row', // 'auto' | 'toolbar' | 'toolbarOnSelect' | 'row'
+              // onClick: (event, rowData) => {
+              //   handleAction('view', rowData)
+              // }
+              icon: () => <Fab size='small' ><VisibilityIcon style={{ color: '#666', fontSize: '18px', margin: '0 0 1px 0px', cursor: 'pointer' }}></VisibilityIcon></Fab>,
               tooltip: 'View',
               position: 'row', // 'auto' | 'toolbar' | 'toolbarOnSelect' | 'row'
               onClick: (event, rowData) => {
@@ -165,25 +176,55 @@ const SourceSystems = (props) => {
               }
             },
             {
-              icon: () => <img src={edit} alt="edit" style={{ maxWidth: '70%' }} />,
+              // icon: () => <img src={edit} alt="edit" style={{ maxWidth: '70%' }} />,
+              // tooltip: 'Edit',
+              // position: 'row',
+              // onClick: (event, rowData) => {
+              //   handleEdit(rowData);
+              // }
+              icon: () => <Fab size='small'><EditIcon style={{ color: '#666', fontSize: '18px', margin: '0 0 1px 0px', cursor: 'pointer' }}></EditIcon></Fab>,
               tooltip: 'Edit',
               position: 'row',
               onClick: (event, rowData) => {
-                handleEdit(rowData);
+                handleAction('edit', rowData);
+                navigate('./edit')
               }
             },
             {
-              icon: () => <img src={clone} alt="clone" style={{ maxWidth: '70%' }} />,
+              // icon: () => <img src={clone} alt="clone" style={{ maxWidth: '70%' }} />,
+              // tooltip: 'Clone',
+              // position: 'row',
+              // onClick: (event, rowData) => {
+              //   handleClone(rowData);
+              // }
+              icon: () => <Fab size='small'><FileCopyOutlinedIcon style={{ color: '#666', fontSize: '18px', margin: '0 0 1px 0px', cursor: 'pointer' }}></FileCopyOutlinedIcon></Fab>,
               tooltip: 'Clone',
               position: 'row',
               onClick: (event, rowData) => {
-                handleClone(rowData);
+                handleAction('clone', rowData)
+                navigate('./create')
+                
               }
             },
             {
-              icon: () => <img src={remove} alt="delete" style={{ maxWidth: '70%' }} />,
+              // icon: () => <img src={remove} alt="delete" style={{ maxWidth: '70%' }} />,
+              // tooltip: 'Delete',
+              // position: 'row',
+              // onClick: (event, rowData) => {
+              //   handleAction('delete', rowData)
+              icon: () => <Fab size='small'><DeleteIcon  style={{ color: '#666', fontSize: '18px', margin: '0 0 1px 0px', cursor: 'pointer' }}></DeleteIcon ></Fab>,
               tooltip: 'Delete',
               position: 'row',
+              onClick: (event, rowData) => {
+                handleAction('delete', rowData)
+              }
+            },
+            {
+              // icon: () => <img src={remove} alt="delete" style={{ maxWidth: '70%' }} />,
+              icon: () => <Fab size='small'><DeleteIcon  style={{ color: '#666', fontSize: '18px', margin: '0 0 1px 0px', cursor: 'pointer' }}></DeleteIcon ></Fab>,
+              tooltip: 'Delete',
+              //isFreeAction: true,
+              position: 'toolbarOnSelect',
               onClick: (event, rowData) => {
                 handleAction('delete', rowData)
               }

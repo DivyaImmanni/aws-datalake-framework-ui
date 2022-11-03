@@ -7,6 +7,10 @@ import LaunchIcon from '@material-ui/icons/Launch';
 import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
 import { closeDataAssetDialogue, openDataAssetDialogue, resetDataAssetValues, updateAllDataAssetValues, updateDataAssetTableData, updateMode, updateSelectedRow } from 'actions/dataAssetActions';
 import { openSideBar, openSnackbar } from 'actions/notificationAction';
+import Fab from '@material-ui/core/Fab';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 import PageTitle from 'components/Common/PageTitle';
 import SearchBar from 'components/Common/SearchBar';
 import tableIcons from "components/MetaData/MaterialTableIcons";
@@ -173,7 +177,7 @@ const DataAssets = (props) => {
           data={filteredList}
           actions={[
             {
-              icon: () => <VisibilityOutlinedIcon style={{ color: '#666', fontSize: '18px', margin: '0 0 1px 0px', cursor: 'pointer' }}></VisibilityOutlinedIcon>,
+              icon: () => <Fab size='small' ><VisibilityIcon style={{ color: '#666', fontSize: '18px', margin: '0 0 1px 0px', cursor: 'pointer' }}></VisibilityIcon></Fab>,
               tooltip: 'View',
               position: 'row', // 'auto' | 'toolbar' | 'toolbarOnSelect' | 'row'
               onClick: (event, rowData) => {
@@ -182,7 +186,7 @@ const DataAssets = (props) => {
               }
             },
             {
-              icon: () => <EditOutlinedIcon style={{ color: '#666', fontSize: '18px', margin: '0 0 1px 5px', cursor: 'pointer' }}></EditOutlinedIcon >,
+              icon: () => <Fab size='small'><EditIcon style={{ color: '#666', fontSize: '18px', margin: '0 0 1px 0px', cursor: 'pointer' }}></EditIcon ></Fab>,
               tooltip: 'Edit',
               position: 'row',
               onClick: (event, rowData) => {
@@ -191,7 +195,7 @@ const DataAssets = (props) => {
             },
             {
 
-              icon: () => <FileCopyOutlinedIcon style={{ color: '#666', fontSize: '18px', margin: '0 0 1px 5px', cursor: 'pointer' }}></FileCopyOutlinedIcon>,
+              icon: () => <Fab size='small'><FileCopyOutlinedIcon style={{ color: '#666', fontSize: '18px', margin: '0 0 1px 0px', cursor: 'pointer' }}></FileCopyOutlinedIcon></Fab>,
               tooltip: 'Clone',
               position: 'row',
               onClick: (event, rowData) => {
@@ -200,7 +204,7 @@ const DataAssets = (props) => {
             },
             {
 
-              icon: () => <DeleteOutlineOutlinedIcon style={{ color: '#666', fontSize: '18px', margin: '0 0 1px 5px', cursor: 'pointer' }}></DeleteOutlineOutlinedIcon>,
+              icon: () => <Fab size='small'><DeleteIcon style={{ color: '#666', fontSize: '18px', margin: '0 0 1px 0px', cursor: 'pointer' }}></DeleteIcon></Fab>,
               tooltip: 'Delete',
               position: 'row',
               onClick: (event, rowData) => {
@@ -208,8 +212,8 @@ const DataAssets = (props) => {
               }
             },
             {
-              icon: () =>
-                <LaunchIcon style={{ color: '#666', fontSize: '18px', margin: '0 0 1px 5px', cursor: 'pointer' }}></LaunchIcon>,
+              icon: () =><Fab size='small'>
+                <LaunchIcon style={{ color: '#666', fontSize: '18px', margin: '0 0 1px 0px', cursor: 'pointer' }}></LaunchIcon></Fab>,
 
               tooltip: 'Catalogs',
               position: 'row',

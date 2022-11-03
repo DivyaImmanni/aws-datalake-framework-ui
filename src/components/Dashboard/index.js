@@ -17,7 +17,41 @@ import { connect } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 
-const useStyles = makeStyles((theme) => ({    
+const useStyles = makeStyles((theme) => ({
+    logo: {
+        display: 'flex',
+        fontSize: '23px',
+        cursor: "pointer",
+        marginRight: theme.spacing(5),
+        textDecoration: "none",
+        color: "white",
+        alignItems: 'flex-start',
+        padding: '20px',
+        flexGrow:1
+    },
+    link: {
+        textDecoration: "none",
+        color: "gray",
+        fontSize: "13px",
+        margin: theme.spacing(2),
+        "&:hover": {
+            color: "#fffc"
+        },
+    },
+    pipe: {
+        position: "relative",
+        margin: "0 20px",
+        "&::after": {
+            "content": "''",
+            "position": "absolute",
+            "height": "40px",
+            "display": "block",
+            "width": "1px",
+            "top": "0px",
+            "background": "#f7901d",
+            "left": "0px"
+        }
+    },
     container: {
         backgroundImage: 'url(' + backgroundImage + ')',
         //  "padding": "0px 20px",
@@ -86,7 +120,7 @@ const useStyles = makeStyles((theme) => ({
         //"minHeight": "330px",
         "display": "flex",
         "flexDirection": "column",
-        "margin": "29px 20px",
+        "margin": "0 20px",
         "position": 'relative',
         textDecoration: 'none',
         '&:hover': {
@@ -160,9 +194,46 @@ const useStyles = makeStyles((theme) => ({
 
 const Dashboard = (props) => {
     const classes = useStyles();
+    const [activePageIndex, setActivePageIndex] = useState(0);
+    const location = useLocation();
+    const { pathname } = location;
+    const handleOnclick = (index) => {
+        setActivePageIndex(index);
+    }
+    const listOfNavItems = [
+        { name: 'Home', icon: <i class="fas fa-layer-group fa-lg"></i>, url: '/' },
+        { name: 'Data Ingestion', icon: <i class="fas fa-layer-group fa-lg"></i>, url: '/source-systems' },
+        { name: 'Pipelines', icon: <i class="fas fa-database fa-lg"></i>, url: '/pipelines/pipelines' },
+        { name: 'Audit', icon: <i class="fas fa-warehouse fa-lg"></i>, url: '/audit/dq-results' },
+        { name: 'Deployment', icon: <i class="fas fa-warehouse fa-lg"></i>, url: '/deployment' }
+    ]
+
+    useEffect(() => {
+        listOfNavItems.forEach((nav, i) => {
+            if (pathname.includes(nav.url)) {
+                setActivePageIndex(i);
+            }
+        })
+    });
 
     return (
-        <div className={classes.container}>            
+        <div className={classes.container}>
+            <div style={{ padding: '15px 5px' }}>
+                <Toolbar style={{ display: 'flex'}}>
+                    <Link to="/" className={classes.logo}>
+                        <img src={logo}  style={{maxWidth: '120px'}}/> <span className={classes.pipe}></span>  
+                        <span style={{ margin: '0 7px'}}>AWS </span> DATA LAKE
+                    </Link>
+                    <div className="font-link">
+                        {listOfNavItems.map((item, index) => {
+                            return <Link key={index} to={item.url} className={classes.link} style={index === activePageIndex ? { 'paddingBottom': 8, 'borderBottom': '4px solid #F7901D', color: 'white' } : {}} onClick={() => handleOnclick(index)}>{item.name} </Link>
+                        })}
+                    </div>
+                    <span style={{padding:'20px 0px 20px 10px', color: '#F7901D', cursor:'pointer'}}> <Tooltip title="log out" placement='top'>
+                        <PowerSettingsNewIcon onClick={() => props.setAuthentication({})} />
+                    </Tooltip></span>
+                </Toolbar>
+            </div>
             <h1 className={classes.pageHeader}>
                 Welcome to Tiger Analytics <img src={awsLogo} />DataLake!
             </h1>
