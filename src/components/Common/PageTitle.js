@@ -32,9 +32,9 @@ const PageTitle = (props) => {
     const classes = useStyles();
 
     return (
-        <div className={classes.headerContainer}>
+        <div className={classes.headerContainer} style={props.style}>
             <h2 className={classes.heading}>
-                <span style={{ fontSize: '25px',  }}>{firstChar}</span>
+                <span style={{ fontSize: '25px'}}>{firstChar}</span>
                 {remainingChar}
             </h2>
             <span className="info" onClick={props.showInfo}>Info</span>

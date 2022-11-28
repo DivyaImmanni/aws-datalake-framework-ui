@@ -1,6 +1,7 @@
 import Dashboard from 'components/Dashboard';
 import DataAssets from 'components/DataAssets';
 import CreateDataAsset from 'components/DataAssets/CreateDataAsset';
+import CreateDataAssetNew from 'components/DataAssets/CreateDataAssetNew';
 import DataAssetDetails from 'components/DataAssets/DataAssetDetails';
 import DataCatalogDetails from 'components/DataAssets/DataCatalogDetails';
 import LakeDestination from 'components/LakeDestination';
@@ -12,6 +13,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Test from './../components/Test/Test';
 
 
+
 const Page = props =>(
     <Routes>
         <Route exact path="/" element={<Dashboard/>}/>
@@ -19,7 +21,7 @@ const Page = props =>(
         <Route path="/source-systems/create" element={<CreateSourceSystem/>}/>
         <Route path="/source-systems/edit" element={<CreateSourceSystem/>}/>
         <Route path="/data-assets" element={<DataAssets/>}/>
-        <Route path="/data-assets/create" element={<CreateDataAsset/>}/>
+        <Route path="/data-assets/create" element={<CreateDataAssetNew/>}/>
         <Route path="/data-assets/edit" element={<CreateDataAsset/>}/>
         <Route path="/data-assets/details/:src_sys_id" element={<DataAssetDetails/>}/>
         <Route path="/data-assets/delete/:src_sys_id" element={<DataAssetDetails/>}/>
